@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     let currentAudioPlayer = null;
     let currentSongIndex = -1;
     let currentAlbumSongs = [];
@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     playAlbumButtons.forEach(button => {
         console.log('Adding event listener to button:', button);
-        button.addEventListener('click', async function(event) {
+        button.addEventListener('click', async function (event) {
             event.preventDefault();
             console.log('Play album button clicked');
             console.log('Button element:', this);
@@ -143,7 +143,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.log('Modal shown successfully');
 
                     // Stop playback when modal is closed
-                    modalElement.addEventListener('hidden.bs.modal', function() {
+                    modalElement.addEventListener('hidden.bs.modal', function () {
                         if (currentAudioPlayer) {
                             currentAudioPlayer.pause();
                             currentAudioPlayer.currentTime = 0;
@@ -186,7 +186,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Handle view artist buttons
     const viewArtistButtons = document.querySelectorAll('.view-artist-btn');
     viewArtistButtons.forEach(button => {
-        button.addEventListener('click', async function(event) {
+        button.addEventListener('click', async function (event) {
             event.preventDefault();
 
             currentArtistTriggerButton = this;
@@ -226,11 +226,12 @@ document.addEventListener('DOMContentLoaded', function() {
                             <div class="mb-3">
                                 <h5>Albums</h5>
                                 <ul class="list-group">
-                                    ${artist.albums && artist.albums.length > 0 ? artist.albums.map(album => `
-                                        <li class="list-group-item">
-                                            <strong>${album.title}</strong> ${album.releaseYear ? `(${album.releaseYear})` : ''}
-                                        </li>
-                                    `).join('') : '<li class="list-group-item text-muted">No albums found</li>'}
+                                ${artist.albums && artist.albums.length > 0 ? (() => {
+                                  const randomAlbums = artist.albums.sort(() => 0.5 - Math.random()).slice(0, 5);
+                                  return randomAlbums.map(album => `<li class="list-group-item">
+                                      <strong>${album.title}</strong> ${album.releaseYear ? `(${album.releaseYear})` : ''}
+                                    </li>`).join('');
+                                })() : '<li class="list-group-item text-muted">No albums found</li>'}
                                 </ul>
                             </div>
                             <div class="d-flex justify-content-end">
@@ -245,7 +246,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const biographyTextarea = document.getElementById('artist-biography');
                 const charCountElement = document.getElementById('biography-char-count');
 
-                biographyTextarea.addEventListener('input', function() {
+                biographyTextarea.addEventListener('input', function () {
                     const currentLength = this.value.length;
                     charCountElement.textContent = `${currentLength}/1000 characters`;
 
@@ -260,7 +261,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
 
                 // Setup save button
-                document.getElementById('save-artist-btn').addEventListener('click', async function() {
+                document.getElementById('save-artist-btn').addEventListener('click', async function () {
                     const biography = document.getElementById('artist-biography').value;
                     try {
                         const updateResponse = await fetch(`/api/artists/${artistId}`, {
@@ -292,7 +293,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 modal.show();
 
                 // Handle modal close
-                modalElement.addEventListener('hidden.bs.modal', function() {
+                modalElement.addEventListener('hidden.bs.modal', function () {
                     const modalInstance = bootstrap.Modal.getInstance(modalElement);
                     if (modalInstance) {
                         modalInstance.dispose();
@@ -325,7 +326,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Shuffle toggle
         if (shuffleBtn) {
-            shuffleBtn.addEventListener('click', function() {
+            shuffleBtn.addEventListener('click', function () {
                 isShuffle = !isShuffle;
                 this.classList.toggle('btn-primary', isShuffle);
                 this.classList.toggle('btn-outline-secondary', !isShuffle);
@@ -335,7 +336,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Repeat toggle
         if (repeatBtn) {
-            repeatBtn.addEventListener('click', function() {
+            repeatBtn.addEventListener('click', function () {
                 isRepeat = !isRepeat;
                 this.classList.toggle('btn-primary', isRepeat);
                 this.classList.toggle('btn-outline-secondary', !isRepeat);
@@ -345,7 +346,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Play specific song
         playButtons.forEach(btn => {
-            btn.addEventListener('click', function() {
+            btn.addEventListener('click', function () {
                 const songIndex = parseInt(this.getAttribute('data-song-index'));
                 playSong(songIndex);
             });
@@ -353,7 +354,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Play/Pause toggle
         if (playPauseBtn) {
-            playPauseBtn.addEventListener('click', function() {
+            playPauseBtn.addEventListener('click', function () {
                 if (isPlaying) {
                     pauseSong();
                 } else {
@@ -370,7 +371,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Previous song
         if (prevBtn) {
-            prevBtn.addEventListener('click', function() {
+            prevBtn.addEventListener('click', function () {
                 let newIndex;
                 if (isShuffle) {
                     newIndex = getRandomSongIndex();
@@ -383,7 +384,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Next song
         if (nextBtn) {
-            nextBtn.addEventListener('click', function() {
+            nextBtn.addEventListener('click', function () {
                 let newIndex;
                 if (isShuffle) {
                     newIndex = getRandomSongIndex();
@@ -431,17 +432,17 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
             // Set up event listeners
-            currentAudioPlayer.addEventListener('loadedmetadata', function() {
+            currentAudioPlayer.addEventListener('loadedmetadata', function () {
                 totalTimeEl.textContent = formatTime(this.duration);
             });
 
-            currentAudioPlayer.addEventListener('timeupdate', function() {
+            currentAudioPlayer.addEventListener('timeupdate', function () {
                 const progress = (this.currentTime / this.duration) * 100;
                 progressBar.style.width = progress + '%';
                 currentTimeEl.textContent = formatTime(this.currentTime);
             });
 
-            currentAudioPlayer.addEventListener('ended', function() {
+            currentAudioPlayer.addEventListener('ended', function () {
                 if (isRepeat) {
                     // Repeat current song
                     currentAudioPlayer.currentTime = 0;
@@ -465,12 +466,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
 
-            currentAudioPlayer.addEventListener('play', function() {
+            currentAudioPlayer.addEventListener('play', function () {
                 isPlaying = true;
                 playPauseBtn.innerHTML = '<i class="bi bi-pause-fill"></i>';
             });
 
-            currentAudioPlayer.addEventListener('pause', function() {
+            currentAudioPlayer.addEventListener('pause', function () {
                 isPlaying = false;
                 playPauseBtn.innerHTML = '<i class="bi bi-play-fill"></i>';
             });
@@ -496,7 +497,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Click on progress bar to seek
         const progressContainer = progressBar.parentElement;
-        progressContainer.addEventListener('click', function(e) {
+        progressContainer.addEventListener('click', function (e) {
             if (currentAudioPlayer && currentAudioPlayer.duration) {
                 const rect = this.getBoundingClientRect();
                 const clickX = e.clientX - rect.left;
@@ -506,7 +507,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         // Volume slider
-        volumeSlider.addEventListener('input', function() {
+        volumeSlider.addEventListener('input', function () {
             currentVolume = this.value / 100;
             if (currentAudioPlayer) {
                 currentAudioPlayer.volume = currentVolume;

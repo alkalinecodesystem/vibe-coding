@@ -2,8 +2,7 @@ package com.example.musicservice.controller;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -34,8 +33,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AlbumController {
 
-	private static final Logger logger = LoggerFactory.getLogger(AlbumController.class);
-
+	
 	private final AlbumService albumService;
 
 	@PostMapping

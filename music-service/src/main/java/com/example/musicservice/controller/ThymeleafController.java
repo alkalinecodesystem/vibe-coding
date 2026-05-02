@@ -87,11 +87,11 @@ public class ThymeleafController {
 				break;
 			}
 		} else {
-			// Show random 10 albums as main feature
+			// Show random 12 albums as main feature
 			albums = albumService.getAllAlbumsForView().stream()
 					.collect(Collectors.collectingAndThen(Collectors.toList(), list -> {
 						Collections.shuffle(list);
-						return list.stream().limit(10).toList();
+						return list.stream().limit(12).toList();
 					}));
 		}
 
