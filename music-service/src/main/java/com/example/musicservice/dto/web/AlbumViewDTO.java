@@ -16,6 +16,7 @@ public class AlbumViewDTO {
 	private Integer releaseYear;
 	private String genre;
 	private String artistName;
+	private Long artistId;
 	private Integer songCount;
 	private boolean hasCover;
 	private String coverContentType;

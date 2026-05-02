@@ -62,6 +62,11 @@
 						<a th:href="@{'/albums/' + ${album.id}}" class="btn btn-sm btn-outline-primary">
 							View Details
 						</a>
+						<button th:if="${album.artistId}" class="btn btn-sm btn-info view-artist-btn" data-bs-toggle="modal"
+							data-bs-target="#artistModal" th:data-artist-id="${album.artistId}"
+							th:data-artist-name="${album.artistName}">
+							<i class="bi bi-person"></i> View Artist
+						</button>
 						<button class="btn btn-sm btn-success play-album-btn" data-bs-toggle="modal"
 							data-bs-target="#albumModal" th:data-album-id="${album.id}"
 							th:data-album-title="${album.title}" th:data-album-artist="${album.artistName}">
@@ -143,6 +148,23 @@
 								<!-- Song list will be inserted here -->
 							</div>
 						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Modal for Artist Info -->
+	<div class="modal fade" id="artistModal" tabindex="-1" aria-labelledby="artistModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="artistModalLabel">Artist Information</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<div id="artist-info">
+						<!-- Artist info will be loaded here -->
 					</div>
 				</div>
 			</div>

@@ -430,6 +430,7 @@ public class AlbumService {
 			dto.setCoverImageBase64(Base64.getEncoder().encodeToString(album.getCoverImage()));
 		}
 		dto.setArtistName(album.getArtist() != null ? album.getArtist().getName() : "Unknown");
+		dto.setArtistId(album.getArtist() != null ? album.getArtist().getId() : null);
 		dto.setSongCount(album.getSongs() != null ? album.getSongs().size() : 0);
 
 		// Convert songs list, sorted by track number (nulls last)
