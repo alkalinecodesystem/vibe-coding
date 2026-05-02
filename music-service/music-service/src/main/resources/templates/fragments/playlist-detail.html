@@ -1,0 +1,287 @@
+<div th:fragment="content">
+	<div class="d-flex justify-content-between align-items-center mb-4">
+		<div>
+			<a href="/playlists" class="btn btn-outline-secondary me-2">
+				<i class="bi bi-arrow-left"></i> Back to Playlists
+			</a>
+			<h2 class="d-inline" th:text="${playlist.name}">Playlist Name</h2>
+		</div>
+		<div>
+			<button class="btn btn-outline-success me-2" data-bs-toggle="modal" data-bs-target="#savePlaylistModal"
+				th:data-playlist-id="${playlist.id}">
+				<i class="bi bi-download"></i> Save Playlist
+			</button>
+			<button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#playPlaylistModal"
+				th:data-playlist-id="${playlist.id}">
+				<i class="bi bi-play-circle-fill"></i> Play Playlist
+			</button>
+			<button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addSongsModal">
+				<i class="bi bi-plus-circle"></i> Add Songs
+			</button>
+		</div>
+	</div>
+
+	<div th:if="${playlist.description}" class="mb-4">
+		<p class="text-muted" th:text="${playlist.description}">Playlist description</p>
+	</div>
+
+	<!-- Playlist Stats -->
+	<div class="row mb-4">
+		<div class="col-md-4">
+			<div class="card border-0 shadow-sm">
+				<div class="card-body text-center">
+					<h3 class="text-primary" th:text="${playlist.songCount}">0</h3>
+					<p class="text-muted mb-0">Songs</p>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-4">
+			<div class="card border-0 shadow-sm">
+				<div class="card-body text-center">
+					<h5 class="text-success" th:text="${#temporals.format(playlist.createdAt, 'MMM dd, yyyy')}">Created
+					</h5>
+					<p class="text-muted mb-0">Created Date</p>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-4">
+			<div class="card border-0 shadow-sm">
+				<div class="card-body text-center">
+					<h5 class="text-info" th:text="${#temporals.format(playlist.updatedAt, 'MMM dd, yyyy')}">Updated
+					</h5>
+					<p class="text-muted mb-0">Last Updated</p>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Songs Table -->
+	<div class="card border-0 shadow-sm">
+		<div class="card-body">
+			<h5 class="card-title">Songs in Playlist</h5>
+			<div class="table-responsive">
+				<table class="table table-hover align-middle">
+					<thead class="table-light">
+						<tr>
+							<th width="60">#</th>
+							<th>Title</th>
+							<th>Track</th>
+							<th>Duration</th>
+							<th>Genre</th>
+							<th>Album</th>
+							<th>Artist</th>
+							<th width="100">Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="song, iterStat : ${playlist.songs}">
+							<td th:text="${iterStat.count}">1</td>
+							<td>
+								<div class="d-flex align-items-center">
+									<i class="bi bi-music-note-beamed me-2 text-muted"></i>
+									<span th:text="${song.title}">Song Title</span>
+								</div>
+							</td>
+							<td th:text="${song.trackNumber}?:'-'">1</td>
+							<td th:text="${song.formattedDuration}">3:30</td>
+							<td>
+								<span class="badge bg-secondary rounded-pill" th:text="${song.genre}?:'-'">Rock</span>
+							</td>
+							<td th:text="${song.album?.title}">Album</td>
+							<td th:text="${song.originalArtist}">Artist</td>
+							<td>
+								<button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal"
+									data-bs-target="#deleteSongModal" th:data-playlist-id="${playlist.id}"
+									th:data-song-id="${song.id}" th:data-song-title="${song.title}"
+									onclick="setDeleteSongData(this)">
+									<i class="bi bi-trash"></i>
+								</button>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<!-- Empty State -->
+			<div th:if="${playlist.songs == null || playlist.songs.isEmpty()}" class="text-center py-5">
+				<i class="bi bi-music-note-list fs-1 text-muted"></i>
+				<h5 class="mt-3">No Songs in Playlist</h5>
+				<p class="text-muted">Add songs to start building your playlist.</p>
+				<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSongsModal">
+					<i class="bi bi-plus-circle"></i> Add Songs
+				</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- Add Songs Modal -->
+	<div class="modal fade" id="addSongsModal" tabindex="-1">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Add Songs to Playlist</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+				</div>
+				<div class="modal-body">
+					<!-- Search and Filters -->
+					<div class="mb-3">
+						<input type="text" class="form-control" id="songSearch"
+							placeholder="Search songs by title, album, or artist...">
+					</div>
+					<!-- Songs List -->
+					<div id="songsList" class="list-group song-list-scroll">
+						<!-- Songs will be loaded here -->
+					</div>
+					<!-- Size Selector and Pagination Controls -->
+					<div class="d-flex justify-content-between align-items-center">
+						<div class="d-flex align-items-center">
+							<label class="me-2">Show:</label>
+							<select id="sizeSelect" class="form-select form-select-sm size-select">
+								<option value="10" selected>10</option>
+								<option value="20">20</option>
+								<option value="30">30</option>
+							</select>
+							<span class="ms-2 text-muted">per page</span>
+						</div>
+						<nav id="paginationControls" class="mb-0" aria-label="Song pagination">
+							<!-- Pagination will be inserted here -->
+						</nav>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Play Playlist Modal -->
+	<div class="modal fade" id="playPlaylistModal" tabindex="-1">
+		<div class="modal-dialog modal-xl">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" th:text="'Playing: ' + ${playlist.name}">Play Playlist</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+				</div>
+				<div class="modal-body">
+					<div class="row">
+						<div class="col-md-4">
+							<div class="text-center">
+								<div id="playlist-cover-container" class="mb-3">
+									<div th:if="${playlist.hasCover}" id="playlist-default-cover">
+										<img th:src="'data:' + ${playlist.coverContentType} + ';base64,' + ${playlist.coverImageBase64}"
+											 alt="Playlist Cover" class="img-fluid rounded shadow-sm" style="max-height: 200px;">
+									</div>
+									<div th:if="${!playlist.hasCover}" id="playlist-default-icon">
+										<i class="bi bi-music-note-list fs-1 text-primary"></i>
+									</div>
+								</div>
+								<h5 th:text="${playlist.name}">Playlist Name</h5>
+								<p class="text-muted" th:if="${playlist.description}" th:text="${playlist.description}">
+									Description</p>
+							</div>
+						</div>
+						<div class="col-md-8">
+							<!-- Audio Controls -->
+							<div id="playlist-audio-controls" class="mb-3" style="display: none;">
+								<div class="d-flex align-items-center justify-content-center mb-2">
+									<button id="playlist-shuffle-btn" class="btn btn-outline-secondary me-2"
+										title="Shuffle">
+										<i class="bi bi-shuffle"></i>
+									</button>
+									<button id="playlist-prev-btn" class="btn btn-outline-secondary me-2">
+										<i class="bi bi-skip-start"></i>
+									</button>
+									<button id="playlist-play-pause-btn" class="btn btn-primary me-2">
+										<i class="bi bi-play-fill"></i>
+									</button>
+									<button id="playlist-next-btn" class="btn btn-outline-secondary me-2">
+										<i class="bi bi-skip-end"></i>
+									</button>
+									<button id="playlist-repeat-btn" class="btn btn-outline-secondary me-2"
+										title="Repeat">
+										<i class="bi bi-repeat"></i>
+									</button>
+								</div>
+								<div class="mb-2">
+									<small id="playlist-current-song-title" class="text-muted"></small>
+								</div>
+								<div class="progress audio-progress">
+									<div id="playlist-progress-bar" class="progress-bar" role="progressbar"
+										style="width: 0%"></div>
+								</div>
+								<div class="d-flex justify-content-between mt-1">
+									<small id="playlist-current-time">0:00</small>
+									<small id="playlist-total-time">0:00</small>
+								</div>
+								<div class="d-flex align-items-center mt-2">
+									<i class="bi bi-volume-down me-2"></i>
+									<input type="range" class="form-range flex-grow-1" id="playlist-volume-slider" min="0" max="100" value="50" step="1">
+									<i class="bi bi-volume-up ms-2"></i>
+								</div>
+							</div>
+
+							<!-- Song List -->
+							<div id="playlist-modal-song-list" class="modal-song-list-scroll">
+								<!-- Song list will be inserted here -->
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Delete Song Confirmation Modal -->
+	<div class="modal fade" id="deleteSongModal" tabindex="-1">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Remove Song from Playlist</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+				</div>
+				<div class="modal-body">
+					<p>Are you sure you want to remove <strong id="delete-song-title"></strong> from this playlist?</p>
+					<p class="text-muted">This action cannot be undone.</p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+					<button type="button" class="btn btn-danger" id="confirmDeleteSongBtn"
+						onclick="confirmRemoveSong()">
+						<i class="bi bi-trash"></i> Remove Song
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Save Playlist Confirmation Modal -->
+	<div class="modal fade" id="savePlaylistModal" tabindex="-1">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Save Playlist to File</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+				</div>
+				<div class="modal-body">
+					<p>Are you sure you want to save <strong th:text="${playlist.name}">this playlist</strong> to a
+						file?</p>
+					<p class="text-muted">The playlist will be saved as a JSON file in the application's playlists
+						directory.</p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+					<button type="button" class="btn btn-success" id="confirmSavePlaylistBtn"
+						th:data-playlist-id="${playlist.id}" onclick="confirmSavePlaylist(this)">
+						<i class="bi bi-download"></i> Save Playlist
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script th:src="@{/playlist-detail.js}"></script>
+</div>

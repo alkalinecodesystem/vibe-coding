@@ -1,0 +1,490 @@
+/* CSS Variables for themes */
+:root {
+	--bg-color: #f5f7fa;
+	--text-color: #212529;
+	--sidebar-bg: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+	--sidebar-text: #adb5bd;
+	--sidebar-hover: rgba(255, 255, 255, 0.1);
+	--card-bg: #ffffff;
+	--border-color: #dee2e6;
+	--primary-color: #0d6efd;
+	--secondary-bg: #f8f9fa;
+	--muted-text: #6c757d;
+	--shadow: rgba(0, 0, 0, 0.1);
+	--navbar-bg: #343a40;
+	--navbar-text: #ffffff;
+}
+
+/* Dracula Theme */
+.theme-dracula {
+	--bg-color: #282a36;
+	--text-color: #f8f8f2;
+	--sidebar-bg: linear-gradient(180deg, #44475a 0%, #6272a4 100%);
+	--sidebar-text: #6272a4;
+	--sidebar-hover: rgba(255, 255, 255, 0.1);
+	--card-bg: #44475a;
+	--border-color: #6272a4;
+	--primary-color: #bd93f9;
+	--secondary-bg: #3c3f4a;
+	--muted-text: #6272a4;
+	--shadow: rgba(0, 0, 0, 0.3);
+	--navbar-bg: #21222c;
+	--navbar-text: #f8f8f2;
+}
+
+/* Solarized Dark Theme */
+.theme-solarized {
+	--bg-color: #002b36;
+	--text-color: #839496;
+	--sidebar-bg: linear-gradient(180deg, #073642 0%, #586e75 100%);
+	--sidebar-text: #586e75;
+	--sidebar-hover: rgba(255, 255, 255, 0.1);
+	--card-bg: #073642;
+	--border-color: #586e75;
+	--primary-color: #b58900;
+	--secondary-bg: #073642;
+	--muted-text: #586e75;
+	--shadow: rgba(0, 0, 0, 0.3);
+	--navbar-bg: #001f27;
+	--navbar-text: #839496;
+}
+
+
+
+/* Dracula Theme - Dark Table Styles */
+.theme-dracula .table {
+	background-color: #282a36;
+	color: #f8f8f2;
+	border-color: #44475a;
+}
+
+.theme-dracula .table thead th {
+	background-color: #44475a;
+	border-bottom-color: #6272a4;
+	color: #f8f8f2;
+}
+
+.theme-dracula .table td,
+.theme-dracula .table th {
+	border-top-color: #44475a;
+}
+
+.theme-dracula .table-hover tbody tr:hover {
+	background-color: #44475a;
+}
+
+.theme-dracula .table-light {
+	background-color: #44475a !important;
+	color: #f8f8f2 !important;
+}
+
+/* Dracula Theme - Modal Styles */
+.theme-dracula .modal-content {
+	background-color: #282a36;
+	color: #f8f8f2;
+	border-color: #44475a;
+}
+
+.theme-dracula .modal-header {
+	background-color: #44475a;
+	border-bottom-color: #6272a4;
+}
+
+.theme-dracula .modal-title {
+	color: #f8f8f2;
+}
+
+.theme-dracula .modal-body {
+	background-color: #282a36;
+	color: #f8f8f2;
+}
+
+.theme-dracula .modal-footer {
+	background-color: #44475a;
+	border-top-color: #6272a4;
+}
+
+.theme-dracula .btn-close {
+	filter: invert(1);
+}
+
+/* Dracula Theme - Badge Styles */
+.theme-dracula .badge {
+	background-color: #6272a4 !important;
+	color: #f8f8f2 !important;
+}
+
+.theme-dracula .badge.bg-primary {
+	background-color: #bd93f9 !important;
+}
+
+.theme-dracula .badge.bg-secondary {
+	background-color: #6272a4 !important;
+}
+
+.theme-dracula .badge.bg-success {
+	background-color: #50fa7b !important;
+}
+
+.theme-dracula .badge.bg-danger {
+	background-color: #ff5555 !important;
+}
+
+/* Dracula Theme - Table Content Styles */
+.theme-dracula .table .btn {
+	border-color: #6272a4;
+	color: #f8f8f2;
+}
+
+.theme-dracula .table .btn:hover {
+	background-color: #44475a;
+	border-color: #bd93f9;
+}
+
+.theme-dracula .table .btn-outline-primary {
+	color: #bd93f9;
+	border-color: #bd93f9;
+}
+
+.theme-dracula .table .btn-outline-primary:hover {
+	background-color: #bd93f9;
+	color: #282a36;
+}
+
+.theme-dracula .table .btn-outline-secondary {
+	color: #6272a4;
+	border-color: #6272a4;
+}
+
+.theme-dracula .table .btn-outline-secondary:hover {
+	background-color: #6272a4;
+	color: #f8f8f2;
+}
+
+.theme-dracula .table .btn-outline-success {
+	color: #50fa7b;
+	border-color: #50fa7b;
+}
+
+.theme-dracula .table .btn-outline-success:hover {
+	background-color: #50fa7b;
+	color: #282a36;
+}
+
+.theme-dracula .table .btn-outline-danger {
+	color: #ff5555;
+	border-color: #ff5555;
+}
+
+.theme-dracula .table .btn-outline-danger:hover {
+	background-color: #ff5555;
+	color: #f8f8f2;
+}
+
+/* Solarized Theme - Dark Table Styles */
+.theme-solarized .table {
+	background-color: #002b36;
+	color: #839496;
+	border-color: #073642;
+}
+
+.theme-solarized .table thead th {
+	background-color: #073642;
+	border-bottom-color: #586e75;
+	color: #839496;
+}
+
+.theme-solarized .table td,
+.theme-solarized .table th {
+	border-top-color: #073642;
+}
+
+.theme-solarized .table-hover tbody tr:hover {
+	background-color: #073642;
+}
+
+.theme-solarized .table-light {
+	background-color: #073642 !important;
+	color: #839496 !important;
+}
+
+/* Solarized Theme - Modal Styles */
+.theme-solarized .modal-content {
+	background-color: #002b36;
+	color: #839496;
+	border-color: #073642;
+}
+
+.theme-solarized .modal-header {
+	background-color: #073642;
+	border-bottom-color: #586e75;
+}
+
+.theme-solarized .modal-title {
+	color: #839496;
+}
+
+.theme-solarized .modal-body {
+	background-color: #002b36;
+	color: #839496;
+}
+
+.theme-solarized .modal-footer {
+	background-color: #073642;
+	border-top-color: #586e75;
+}
+
+.theme-solarized .btn-close {
+	filter: invert(0.8);
+}
+
+/* Solarized Theme - Badge Styles */
+.theme-solarized .badge {
+	background-color: #586e75 !important;
+	color: #002b36 !important;
+}
+
+.theme-solarized .badge.bg-primary {
+	background-color: #b58900 !important;
+	color: #002b36 !important;
+}
+
+.theme-solarized .badge.bg-secondary {
+	background-color: #2aa198 !important;
+	color: #002b36 !important;
+}
+
+.theme-solarized .badge.bg-success {
+	background-color: #859900 !important;
+	color: #002b36 !important;
+}
+
+.theme-solarized .badge.bg-danger {
+	background-color: #dc322f !important;
+	color: #fdf6e3 !important;
+}
+
+/* Solarized Theme - Table Content Styles */
+.theme-solarized .table .btn {
+	border-color: #586e75;
+	color: #839496;
+}
+
+.theme-solarized .table .btn:hover {
+	background-color: #073642;
+	border-color: #b58900;
+}
+
+.theme-solarized .table .btn-outline-primary {
+	color: #b58900;
+	border-color: #b58900;
+}
+
+.theme-solarized .table .btn-outline-primary:hover {
+	background-color: #b58900;
+	color: #002b36;
+}
+
+.theme-solarized .table .btn-outline-secondary {
+	color: #2aa198;
+	border-color: #2aa198;
+}
+
+.theme-solarized .table .btn-outline-secondary:hover {
+	background-color: #2aa198;
+	color: #002b36;
+}
+
+.theme-solarized .table .btn-outline-success {
+	color: #859900;
+	border-color: #859900;
+}
+
+.theme-solarized .table .btn-outline-success:hover {
+	background-color: #859900;
+	color: #002b36;
+}
+
+.theme-solarized .table .btn-outline-danger {
+	color: #dc322f;
+	border-color: #dc322f;
+}
+
+.theme-solarized .table .btn-outline-danger:hover {
+	background-color: #dc322f;
+	color: #839496;
+}
+
+
+
+/* Apply variables */
+body {
+	background-color: var(--bg-color);
+	color: var(--text-color);
+}
+
+.sidebar {
+	min-height: 100vh;
+	background: var(--sidebar-bg);
+}
+
+.sidebar .nav-link {
+	color: var(--sidebar-text);
+	font-weight: 500;
+	padding: 12px 20px;
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+	color: #fff;
+	background-color: var(--sidebar-hover);
+}
+
+.sidebar .nav-link i {
+	margin-right: 10px;
+}
+
+.main-content {
+	min-height: 100vh;
+	background-color: var(--bg-color);
+}
+
+.stat-card,
+.card {
+	background-color: var(--card-bg);
+	border-color: var(--border-color);
+	color: var(--text-color);
+}
+
+.navbar {
+	background-color: var(--navbar-bg) !important;
+}
+
+.navbar-brand,
+.navbar-nav .nav-link {
+	color: var(--navbar-text) !important;
+}
+
+.btn-primary {
+	background-color: var(--primary-color);
+	border-color: var(--primary-color);
+}
+
+.btn-outline-primary {
+	color: var(--primary-color);
+	border-color: var(--primary-color);
+}
+
+.btn-outline-primary:hover {
+	background-color: var(--primary-color);
+	border-color: var(--primary-color);
+}
+
+.text-muted {
+	color: var(--muted-text) !important;
+}
+
+.table {
+	background-color: var(--card-bg);
+	color: var(--text-color);
+}
+
+.table thead th {
+	border-bottom-color: var(--border-color);
+	background-color: var(--secondary-bg);
+}
+
+.table td,
+.table th {
+	border-top-color: var(--border-color);
+}
+
+.table-hover tbody tr:hover {
+	background-color: var(--secondary-bg);
+}
+
+.album-cover {
+	width: 100px;
+	height: 100px;
+	object-fit: cover;
+	border-radius: 8px;
+	box-shadow: 0 2px 8px var(--shadow);
+}
+
+.album-cover-large {
+	width: 200px;
+	height: 200px;
+	object-fit: cover;
+	border-radius: 8px;
+	box-shadow: 0 4px 16px var(--shadow);
+}
+
+.nav-pills .nav-link.active {
+	background-color: var(--primary-color);
+}
+
+.card-hover:hover {
+	transform: translateY(-3px);
+	box-shadow: 0 4px 16px var(--shadow);
+}
+
+.dropzone {
+	border: 2px dashed var(--primary-color);
+	border-radius: 12px;
+	padding: 40px;
+	text-align: center;
+	background-color: var(--secondary-bg);
+	cursor: pointer;
+	transition: all 0.3s;
+}
+
+.dropzone:hover,
+.dropzone.dragover {
+	background-color: var(--bg-color);
+	border-color: var(--primary-color);
+}
+
+.stat-card {
+	border-radius: 12px;
+	border: none;
+	box-shadow: 0 2px 8px var(--shadow);
+}
+
+/* Album cover styles */
+.album-cover-container {
+	height: 180px;
+}
+
+.album-cover {
+	max-height: 180px;
+	object-fit: contain;
+}
+
+.modal-album-cover {
+	max-height: 250px;
+}
+
+/* Progress bar styles */
+.upload-progress {
+	height: 25px;
+}
+
+.audio-progress {
+	height: 6px;
+}
+
+/* Select width */
+.size-select {
+	width: auto;
+}
+
+/* Scrollable lists */
+.song-list-scroll {
+	height: 400px;
+	overflow-y: auto;
+}
+
+.modal-song-list-scroll {
+	max-height: 400px;
+	overflow-y: auto;
+}
