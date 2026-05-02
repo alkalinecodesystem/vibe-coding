@@ -1,0 +1,516 @@
+# Music Manager Microservice
+
+A Spring Boot REST API for managing artists, albums, songs, and playlists with ZIP file upload support for bulk import.
+
+## Tech Stack
+
+- **Spring Boot** 3.2.0
+- **Java 17**
+- **JPA/Hibernate** for ORM
+- **H2 Database** (in-memory)
+- **Lombok** for boilerplate reduction
+- **JAudiotagger** for reading audio file metadata
+- **Maven** for dependency management
+
+## Features
+
+- **REST API** for CRUD operations (Artists, Albums, Songs, Playlists)
+- **HTML Web UI** (Thymeleaf) for browsing, upload, and playlist management
+- **Search** by artist name, album title, song title, or playlist name
+- **Playlist Management** for creating and managing custom song collections
+- **Bulk Import** via ZIP file containing audio files (MP3, FLAC, OGG, WAV, M4A)
+- Automatic tag reading from audio files (ID3 tags)
+- Album cover extraction from embedded artwork
+- Input validation and error handling
+- SQL injection prevention via JPA parameter binding
+- JSON API responses (mobile-first)
+- Pagination for albums with covers and songs
+- Comprehensive logging with SLF4J
+
+## Getting Started
+
+### Prerequisites
+
+- Java 17+
+- Maven 3.8+
+
+### Running the Application
+
+```bash
+cd music-service
+mvn spring-boot:run
+```
+
+The service starts on **http://localhost:8081**
+
+Access Points:
+- **Web UI**: http://localhost:8081/
+- **REST API**: http://localhost:8081/api/*
+- **H2 Console**: http://localhost:8081/h2-console
+
+- JDBC URL: `jdbc:h2:mem:musicdb`
+- Username: `sa`
+- Password: (empty)
+
+## API Endpoints
+
+All endpoints return JSON in the format:
+```json
+{
+  "success": true,
+  "message": "Operation successful",
+  "data": { ... },
+  "errors": null
+}
+```
+
+### Artists
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/artists` | Create a new artist |
+| GET | `/api/artists/{id}` | Get artist by ID |
+| GET | `/api/artists` | Get all artists |
+| GET | `/api/artists/search?q={query}` | Search artists by name |
+| PUT | `/api/artists/{id}` | Update artist |
+| DELETE | `/api/artists/{id}` | Delete artist |
+
+**Example - Create Artist:**
+```bash
+curl -X POST http://localhost:8081/api/artists \
+  -H "Content-Type: application/json" \
+  -d '{"name":"The Beatles","biography":"Legendary rock band"}'
+```
+
+### Albums
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/albums` | Create a new album |
+| GET | `/api/albums/{id}` | Get album by ID |
+| GET | `/api/albums` | Get all albums |
+| GET | `/api/albums/with-covers` | Get albums with cover images (paginated) |
+| GET | `/api/albums/search/title?q={query}` | Search albums by title |
+| GET | `/api/albums/search/artist?q={query}` | Search albums by artist name |
+| PUT | `/api/albums/{id}` | Update album |
+| PATCH | `/api/albums/{id}/genre?genre={genre}` | Update album genre only |
+| DELETE | `/api/albums/{id}` | Delete album |
+| POST | `/api/albums/{id}/cover` | Upload/update album cover image |
+| GET | `/api/albums/{id}/cover` | Download album cover image |
+| DELETE | `/api/albums/{id}/cover` | Delete album cover image |
+
+**Example - Create Album:**
+```bash
+curl -X POST http://localhost:8081/api/albums \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Abbey Road","releaseYear":1969,"artistId":1}'
+```
+
+**Update genre only:**
+```bash
+curl -X PATCH "http://localhost:8081/api/albums/1/genre?genre=Rock"
+```
+
+**Upload album cover:**
+```bash
+curl -X POST "http://localhost:8081/api/albums/1/cover" \
+  -F "file=@/path/to/cover.jpg"
+```
+
+**Download album cover:**
+```bash
+curl -X GET "http://localhost:8081/api/albums/1/cover" --output cover.jpg
+```
+
+**Paginated albums with covers:**
+```bash
+curl -X GET "http://localhost:8081/api/albums/with-covers?page=0&size=20&sort=id,desc"
+```
+
+### Songs
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/songs` | Create a new song |
+| GET | `/api/songs/{id}` | Get song by ID |
+| GET | `/api/songs` | Get all songs |
+| GET | `/api/songs/search/title?q={query}` | Search songs by title |
+| GET | `/api/songs/search/album?q={query}` | Search songs by album title |
+| GET | `/api/songs/search/artist?q={query}` | Search songs by artist name |
+| PUT | `/api/songs/{id}` | Update song |
+| DELETE | `/api/songs/{id}` | Delete song |
+
+**Example - Create Song:**
+```bash
+curl -X POST http://localhost:8081/api/songs \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Come Together","trackNumber":1,"durationSeconds":259,"genre":"Rock","albumId":1}'
+```
+
+**Example - Get Song Response (after ZIP upload):**
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "title": "Come Together",
+    "trackNumber": 1,
+    "durationSeconds": 259,
+    "genre": "Rock",
+    "filePath": "/home/user/music-extracted/20240429_211739_1234abcd/The Beatles/Abbey Road/01 - Come Together.mp3",
+    "album": {
+      "id": 1,
+      "title": "Abbey Road",
+      "artist": {
+        "id": 1,
+        "name": "The Beatles"
+      }
+    }
+  }
+}
+```
+
+### Playlists
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/playlists` | Create a new playlist |
+| GET | `/api/playlists/{id}` | Get playlist by ID |
+| GET | `/api/playlists` | Get all playlists |
+| PUT | `/api/playlists/{id}` | Update playlist |
+| DELETE | `/api/playlists/{id}` | Delete playlist |
+| POST | `/api/playlists/{playlistId}/songs/{songId}` | Add song to playlist |
+| DELETE | `/api/playlists/{playlistId}/songs/{songId}` | Remove song from playlist |
+| POST | `/api/playlists/{id}/save` | Save playlist to file |
+
+**Example - Create Playlist:**
+```bash
+curl -X POST http://localhost:8081/api/playlists \
+  -H "Content-Type: application/json" \
+  -d '{"name":"My Favorites","description":"A collection of my favorite songs"}'
+```
+
+**Example - Add Song to Playlist:**
+```bash
+curl -X POST http://localhost:8081/api/playlists/1/songs/1
+```
+
+### File Upload
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/upload/zip` | Upload ZIP file containing audio files |
+
+**Example - Upload ZIP:**
+```bash
+curl -X POST http://localhost:8081/api/upload/zip \
+  -F "file=@/path/to/music.zip"
+```
+
+**Example response:**
+```json
+{
+  "success": true,
+  "message": "File uploaded and processed successfully",
+  "data": {
+    "success": true,
+    "message": "Processed 10 audio files. Created: 2 artists, 3 albums, 10 songs. Skipped: 0 files",
+    "extractionPath": "/home/user/music-extracted/20240429_211739_1234abcd"
+  },
+  "errors": null
+}
+```
+
+**ZIP File Structure:**
+The ZIP file should contain audio files (MP3, FLAC, OGG, WAV, M4A) organized in any directory structure. The service will:
+1. Extract the ZIP to a persistent directory (configured via `app.upload.extracted-dir`, default: `/home/user/music-extracted`)
+2. Scan for supported audio files recursively
+3. Read ID3/metadata tags from each file
+4. **Store the absolute file path** of each audio file in the `songs.filePath` field
+5. Create artists, albums, and songs in the database
+6. Return a summary of processed files including the extraction path
+
+**Configuration:**
+```properties
+# Maximum file size (default: 500MB)
+spring.servlet.multipart.max-file-size=500MB
+spring.servlet.multipart.max-request-size=500MB
+
+# Extracted files storage directory (default: /home/user/music-extracted)
+app.upload.extracted-dir=/path/to/your/extracted-files
+
+# Playlists storage directory (default: /home/user/playlists)
+app.playlists.dir=/path/to/your/playlists
+```
+
+**Required Tags:**
+- `ARTIST` (artist name)
+- `ALBUM` (album title)
+- `TITLE` (song title)
+
+Optional tags:
+- `TRACK` (track number)
+- `YEAR` (release year)
+- `GENRE` (genre)
+- Duration is read from audio header
+
+**Note:** Duplicate artists (by name) and albums (by title + artist) are automatically detected and reused.
+
+## Web Interface
+
+The service includes a Thymeleaf-based web UI for managing your music collection.
+
+### Web Pages
+
+| URL | Description |
+|-----|-------------|
+| `/` | Dashboard with statistics and recent albums |
+| `/albums` | Browse all albums with cover thumbnails |
+| `/songs` | Browse all songs searchable by title/album/artist |
+| `/playlists` | Browse all playlists and their songs |
+| `/playlists/{id}` | View playlist details |
+| `/upload` | ZIP file upload form with drag & drop |
+
+### Features
+- Responsive design (Bootstrap 5)
+- Album grid view with cover images
+- Album detail modals
+- Song list with search and pagination
+- Playlist creation and management
+- Upload progress bar and drag-and-drop
+- Real-time statistics
+
+### Screenshots
+
+**Dashboard:**
+Shows total counts (artists, albums, songs, playlists, covers) and recently added albums with covers.
+
+**Albums Page:**
+Grid of album cards showing cover art, title, artist, year, genre, and song count.
+
+**Songs Page:**
+Table view with song details including file path, album, artist, with pagination.
+
+**Playlists Page:**
+List of user-created playlists with song counts and descriptions.
+
+**Upload Page:**
+Drag-and-drop ZIP uploader with progress indicator and status messages.
+
+## Data Model
+
+### Artist
+- `id` (auto-generated)
+- `name` (unique, required, 2-100 chars)
+- `biography` (optional, max 1000 chars)
+
+### Album
+- `id` (auto-generated)
+- `title` (required, 2-200 chars)
+- `releaseYear` (optional, 1000-2100)
+- `genre` (optional, max 50 chars)
+- `coverImage` (binary, optional JPEG/PNG up to 5MB)
+- `coverContentType` (MIME type, e.g., `image/jpeg`)
+- `hasCover` (boolean, derived field in responses)
+- `artist` (many-to-one relationship)
+
+### Song
+- `id` (auto-generated)
+- `title` (required, 2-200 chars)
+- `trackNumber` (optional, 1-999)
+- `durationSeconds` (optional)
+- `genre` (optional, max 50 chars)
+- `filePath` (optional, absolute path to the audio file on server after extraction, max 500 chars)
+- `album` (many-to-one relationship)
+
+### Playlist
+- `id` (auto-generated)
+- `name` (required, 1-100 chars)
+- `description` (optional, max 500 chars)
+- `createdAt` (auto-generated timestamp)
+- `updatedAt` (auto-updated timestamp)
+- `songs` (many-to-many relationship)
+
+## Security
+
+- **SQL Injection Prevention**: All database queries use JPA parameter binding
+- **Input Validation**: All inputs validated with Jakarta Bean Validation
+- **Path Traversal Protection**: ZIP extraction sanitizes file paths
+- **File Type Validation**: Only ZIP files accepted; only audio files processed
+
+## Error Handling
+
+Errors return appropriate HTTP status codes:
+
+- `400 Bad Request` - Validation errors, invalid file
+- `404 Not Found` - Resource not found
+- `409 Conflict` - Duplicate artist name
+- `500 Internal Server Error` - Unexpected errors
+
+Example error response:
+```json
+{
+  "success": false,
+  "message": "Validation failed",
+  "data": null,
+  "errors": [
+    {"field": "name", "message": "Artist name is required"}
+  ]
+}
+```
+
+## Logging
+
+Logs are configured at:
+- `com.example.musicservice` - DEBUG level
+- `org.springframework` - INFO level
+
+Logs include operation details, errors, and warnings for missing tags or invalid files.
+
+## Database Schema
+
+The application uses Hibernate's `ddl-auto=update` to auto-create/update tables:
+
+```sql
+CREATE TABLE artists (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL UNIQUE,
+  biography VARCHAR(1000)
+);
+
+CREATE TABLE albums (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(200) NOT NULL,
+  release_year INTEGER,
+  genre VARCHAR(50),
+  cover_content_type VARCHAR(50),
+  cover_image BLOB,
+  artist_id BIGINT NOT NULL,
+  FOREIGN KEY (artist_id) REFERENCES artists(id)
+);
+
+CREATE TABLE songs (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(200) NOT NULL,
+  track_number INTEGER,
+  duration_seconds INTEGER,
+  genre VARCHAR(50),
+  file_path VARCHAR(500),
+  album_id BIGINT NOT NULL,
+  FOREIGN KEY (album_id) REFERENCES albums(id)
+);
+
+CREATE TABLE playlists (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  description VARCHAR(500),
+  created_at TIMESTAMP NOT NULL,
+  updated_at TIMESTAMP NOT NULL
+);
+
+CREATE TABLE playlist_songs (
+  playlist_id BIGINT NOT NULL,
+  song_id BIGINT NOT NULL,
+  PRIMARY KEY (playlist_id, song_id),
+  FOREIGN KEY (playlist_id) REFERENCES playlists(id),
+  FOREIGN KEY (song_id) REFERENCES songs(id)
+);
+```
+
+## Testing
+
+Run tests with:
+```bash
+mvn test
+```
+
+## Building
+
+Create a fat JAR:
+```bash
+mvn clean package
+```
+
+Run the JAR:
+```bash
+java -jar target/music-service-1.0.0.jar
+```
+
+## Project Structure
+
+```
+music-service/
+├── src/main/java/com/example/musicservice/
+│   ├── MusicServiceApplication.java    # Main application class
+│   ├── controller/                     # REST controllers
+│   │   ├── ArtistController.java
+│   │   ├── AlbumController.java
+│   │   ├── PlaylistController.java
+│   │   ├── SongController.java
+│   │   ├── ThymeleafController.java     # MVC controller for Thymeleaf pages
+│   │   └── UploadController.java
+│   ├── dto/                            # Data transfer objects
+│   │   ├── ApiResponse.java
+│   │   ├── ArtistRequest.java
+│   │   ├── ArtistResponse.java
+│   │   ├── AlbumRequest.java
+│   │   ├── AlbumResponse.java
+│   │   ├── PaginatedResponse.java
+│   │   ├── PlaylistRequest.java
+│   │   ├── PlaylistResponse.java
+│   │   ├── SongRequest.java
+│   │   ├── SongResponse.java
+│   │   ├── UploadResponse.java
+│   │   ├── web/
+│   │   │   ├── AlbumViewDTO.java
+│   │   │   ├── PlaylistViewDTO.java
+│   │   │   └── SongViewDTO.java
+│   ├── exception/                      # Exception handling
+│   │   ├── GlobalExceptionHandler.java
+│   │   ├── InvalidFileException.java
+│   │   └── ResourceNotFoundException.java
+│   ├── model/                          # JPA entities
+│   │   ├── Album.java
+│   │   ├── Artist.java
+│   │   ├── Playlist.java
+│   │   └── Song.java
+│   ├── repository/                     # Spring Data JPA repositories
+│   │   ├── AlbumRepository.java
+│   │   ├── ArtistRepository.java
+│   │   ├── PlaylistRepository.java
+│   │   └── SongRepository.java
+│   └── service/                        # Business logic
+│       ├── AlbumService.java
+│       ├── ArtistService.java
+│       ├── PlaylistService.java
+│       ├── SongService.java
+│       └── ZipUploadService.java
+├── src/main/resources/
+│   ├── application.properties
+│   ├── static/
+│   │   └── favicon.ico
+│   └── templates/
+│       ├── layout.html
+│       ├── fragments/
+│       │   ├── album-detail.html
+│       │   ├── albums.html
+│       │   ├── dashboard.html
+│       │   ├── header.html
+│       │   ├── playlist-detail.html
+│       │   ├── playlists.html
+│       │   ├── songs.html
+│       │   └── upload.html
+└── pom.xml
+```
+
+## Future Improvements
+
+- Add authentication/authorization (Spring Security)
+- Support additional metadata fields (composer, lyrics, etc.)
+- Add file validation (actual MIME type checking)
+- Add rate limiting for uploads
+- Add integration tests
+- Support for external databases (PostgreSQL, MySQL)
+- Add caching (Redis)
+- Add Swagger/OpenAPI documentation
+- Add support for streaming large files

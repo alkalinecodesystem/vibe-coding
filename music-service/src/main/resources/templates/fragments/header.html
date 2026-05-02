@@ -1,0 +1,15 @@
+<nav th:fragment="header" class="navbar navbar-expand-lg navbar-dark mb-4">
+	<div class="container-fluid">
+		<a class="navbar-brand" href="/">
+			<i class="bi bi-music-note-beamed"></i> Music Manager
+		</a>
+		<div class="d-flex align-items-center">
+			<label for="themeSelect" class="text-white me-2">Theme:</label>
+			<select id="themeSelect" class="form-select form-select-sm">
+				<option value="default">Default</option>
+				<option value="dracula">Dracula</option>
+				<option value="solarized">Solarized</option>
+			</select>
+		</div>
+	</div>
+</nav>

@@ -1,0 +1,25 @@
+package com.example.musicservice.repository;
+
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import com.example.musicservice.model.Song;
+
+@Repository
+public interface SongRepository extends JpaRepository<Song, Long> {
+	List<Song> findByTitleContainingIgnoreCase(String title);
+
+	List<Song> findByAlbum_TitleContainingIgnoreCase(String albumTitle);
+
+	List<Song> findByOriginalArtistContainingIgnoreCase(String originalArtist);
+
+	Page<Song> findByTitleContainingIgnoreCase(String title, Pageable pageable);
+
+	Page<Song> findByAlbum_TitleContainingIgnoreCase(String albumTitle, Pageable pageable);
+
+	Page<Song> findByOriginalArtistContainingIgnoreCase(String originalArtist, Pageable pageable);
+}
