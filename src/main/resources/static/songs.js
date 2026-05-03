@@ -1,7 +1,7 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const sizeSelect = document.getElementById('sizeSelect');
     if (sizeSelect) {
-        sizeSelect.addEventListener('change', function() {
+        sizeSelect.addEventListener('change', function () {
             const size = this.value;
             const url = new URL(window.location);
             url.searchParams.set('size', size);
@@ -166,18 +166,34 @@ function addPaginationToModal(songId, paginatedData, size = 5) {
                                 <span aria-hidden="true">&laquo;</span>
                             </button>
                         </li>
-                        ${(() => {
-                            const startPage = Math.max(0, currentPage - 2);
-                            const endPage = Math.min(totalPages - 1, currentPage + 2);
-                            let pages = '';
-                            for (let i = startPage; i <= endPage; i++) {
-                                pages += `<li class="page-item ${i === currentPage ? 'active' : ''}>
-                                    <button class="page-link" ${i === currentPage ? 'disabled' : ''} onclick="loadPlaylistPage(${songId}, ${i}, ${size})">${i + 1}</button>
-                                </li>`;
-                            }
-                            return pages;
-                        })()}
-                        <li class="page-item ${!hasNext ? 'disabled' : ''}">
+ ${(() => {
+                const startPage = Math.max(0, currentPage - 2);
+                const endPage = Math.min(totalPages - 1, currentPage + 2);
+                let pages = '';
+
+                for (let i = startPage; i <= endPage; i++) {
+                    if (i === currentPage) {
+                        // Página actual (equivalente al <span>)
+                        pages += `
+                <li class="page-item active">
+                    <span class="page-link">${i + 1}</span>
+                </li>
+            `;
+                    } else {
+                        // Otras páginas (equivalente al <a>)
+                        pages += `
+                <li class="page-item">
+                    <button class="page-link"
+                        onclick="loadPlaylistPage(${songId}, ${i}, ${size})">
+                        ${i + 1}
+                    </button>
+                </li>
+            `;
+                    }
+                }
+
+                return pages;
+            })()}                       <li class="page-item ${!hasNext ? 'disabled' : ''}">
                             <button class="page-link" onclick="loadPlaylistPage(${songId}, ${currentPage + 1}, ${size})" aria-label="Next" ${!hasNext ? 'disabled' : ''}>
                                 <span aria-hidden="true">&raquo;</span>
                             </button>
@@ -202,7 +218,7 @@ function addPaginationToModal(songId, paginatedData, size = 5) {
             const newSizeSelect = sizeSelect.cloneNode(true);
             sizeSelect.parentNode.replaceChild(newSizeSelect, sizeSelect);
 
-            newSizeSelect.addEventListener('change', function() {
+            newSizeSelect.addEventListener('change', function () {
                 const newSize = parseInt(this.value);
                 loadPlaylistPage(songId, 0, newSize);
             });
