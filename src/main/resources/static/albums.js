@@ -465,7 +465,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     newIndex = getRandomSongIndex();
                 } else {
                     newIndex = currentSongIndex > 0 ? currentSongIndex - 1 : currentAlbumSongs.length - 1;
-                    alert(newIndex);
                 }
                 playSong(newIndex);
             });
@@ -479,7 +478,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     newIndex = getRandomSongIndex();
                 } else {
                     newIndex = currentSongIndex < currentAlbumSongs.length - 1 ? currentSongIndex + 1 : 0;
-                    alert(newIndex);
                 }
                 playSong(newIndex);
             });
