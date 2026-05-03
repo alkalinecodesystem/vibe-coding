@@ -10,9 +10,13 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.musicservice.dto.PaginatedResponse;
 import com.example.musicservice.dto.PlaylistRequest;
 import com.example.musicservice.dto.PlaylistResponse;
 import com.example.musicservice.dto.web.PlaylistViewDTO;
@@ -64,6 +68,20 @@ public class PlaylistService {
 		logger.debug("Fetching all playlists");
 		return playlistRepository.findAllByOrderByCreatedAtDesc().stream().map(this::convertToResponse)
 				.collect(Collectors.toList());
+	}
+
+	@Transactional(readOnly = true)
+	public PaginatedResponse<PlaylistResponse> getPlaylistsPaginated(int page, int size) {
+		logger.debug("Fetching playlists paginated: page={}, size={}", page, size);
+		Pageable pageable = PageRequest.of(page, size);
+		Page<Playlist> playlistPage = playlistRepository.findAllByOrderByCreatedAtDesc(pageable);
+
+		List<PlaylistResponse> content = playlistPage.getContent().stream().map(this::convertToResponse)
+				.collect(Collectors.toList());
+
+		return new PaginatedResponse<>(content, playlistPage.getTotalPages(), playlistPage.getTotalElements(),
+				playlistPage.getNumber(), playlistPage.getSize(), playlistPage.isFirst(), playlistPage.isLast(),
+				playlistPage.hasNext(), playlistPage.hasPrevious());
 	}
 
 	@Transactional(readOnly = true)

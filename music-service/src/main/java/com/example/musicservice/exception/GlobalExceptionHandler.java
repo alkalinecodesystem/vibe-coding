@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.apache.catalina.connector.ClientAbortException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -57,6 +58,13 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<ApiResponse<Object>> handleIllegalArgument(IllegalArgumentException ex) {
 		logger.warn("Illegal argument: {}", ex.getMessage());
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.error(ex.getMessage()));
+	}
+
+	@ExceptionHandler(ClientAbortException.class)
+	public ResponseEntity<Void> handleClientAbort(ClientAbortException ex) {
+		logger.warn("Client aborted connection: {}", ex.getMessage());
+		// Connection is closed, no need to send response
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
 	@ExceptionHandler(Exception.class)

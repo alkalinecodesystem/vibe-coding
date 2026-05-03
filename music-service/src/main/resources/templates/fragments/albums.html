@@ -13,7 +13,7 @@
 		<div class="card-body">
 			<form class="row g-3" th:action="@{/albums}" method="get">
 				<div class="col-md-6">
-					<input type="text" name="q" class="form-control"
+					<input type="text" id="search-input" name="q" class="form-control"
 						placeholder="Search albums by title, artist, or song..." th:value="${searchQuery}">
 				</div>
 				<div class="col-md-4">
@@ -33,6 +33,11 @@
 			</form>
 		</div>
 	</div>
+
+	<!-- Search Results Count -->
+	<p class="text-muted" id="search-results-count" style="display: none;">
+		<span id="matching-count">0</span> of <span id="total-count">0</span> albums
+	</p>
 
 	<!-- Albums Grid -->
 	<div class="row" th:if="${albums}">
@@ -170,6 +175,6 @@
 			</div>
 		</div>
 	</div>
+	<script th:src="@{/albums.js}"></script>
 </div>
 
-<script th:src="@{/albums.js}"></script>

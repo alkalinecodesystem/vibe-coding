@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.musicservice.dto.ApiResponse;
+import com.example.musicservice.dto.PaginatedResponse;
 import com.example.musicservice.dto.PlaylistRequest;
 import com.example.musicservice.dto.PlaylistResponse;
 import com.example.musicservice.service.PlaylistService;
@@ -49,9 +51,10 @@ public class PlaylistController {
 	}
 
 	@GetMapping
-	public ResponseEntity<ApiResponse<List<PlaylistResponse>>> getAllPlaylists() {
-		logger.debug("Fetching all playlists");
-		List<PlaylistResponse> response = playlistService.getAllPlaylists();
+	public ResponseEntity<ApiResponse<PaginatedResponse<PlaylistResponse>>> getAllPlaylists(
+			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+		logger.debug("Fetching playlists paginated: page={}, size={}", page, size);
+		PaginatedResponse<PlaylistResponse> response = playlistService.getPlaylistsPaginated(page, size);
 		return ResponseEntity.ok(ApiResponse.success(response));
 	}
 
