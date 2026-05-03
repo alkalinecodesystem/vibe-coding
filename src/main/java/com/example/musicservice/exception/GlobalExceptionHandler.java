@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
+
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -67,10 +69,18 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
+	@ExceptionHandler(NoResourceFoundException.class)
+	public ResponseEntity<ApiResponse<Object>> handleNoResourceFound(NoResourceFoundException ex) {
+		logger.warn("Static resource not found: {}", ex.getResourcePath());
+		return ResponseEntity.status(HttpStatus.NOT_FOUND)
+				.body(ApiResponse.error("Resource not found"));
+	}
+
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ApiResponse<Object>> handleGenericException(Exception ex) {
 		logger.error("Unexpected error", ex);
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 				.body(ApiResponse.error("An unexpected error occurred"));
 	}
+
 }
