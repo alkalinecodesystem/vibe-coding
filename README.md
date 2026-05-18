@@ -321,6 +321,7 @@ Drag-and-drop ZIP uploader with progress indicator and status messages.
 - `durationSeconds` (optional)
 - `genre` (optional, max 50 chars)
 - `filePath` (optional, absolute path to the audio file on server after extraction, max 500 chars)
+- `originalArtist` (optional, max 100 chars)
 - `album` (many-to-one relationship)
 
 ### Playlist

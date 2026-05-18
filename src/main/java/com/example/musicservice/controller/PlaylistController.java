@@ -1,7 +1,6 @@
 package com.example.musicservice.controller;
 
 import java.io.IOException;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,6 +98,33 @@ public class PlaylistController {
 			logger.error("Failed to save playlist {} to file", id, e);
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 					.body(ApiResponse.error("Failed to save playlist to file: " + e.getMessage()));
+		}
+	}
+
+	@GetMapping("/{id}/download")
+	public void downloadPlaylist(@PathVariable Long id, jakarta.servlet.http.HttpServletResponse response) throws IOException {
+		logger.info("Downloading playlist {} as zip", id);
+		java.util.List<java.nio.file.Path> tracks = playlistService.getFilesForPlaylist(id);
+		response.setContentType("application/zip");
+		response.setHeader("Content-Disposition", "attachment; filename=\"playlist-" + id + ".zip\"");
+		try (java.util.zip.ZipOutputStream zos = new java.util.zip.ZipOutputStream(response.getOutputStream())) {
+			byte[] buffer = new byte[8192];
+			for (java.nio.file.Path track : tracks) {
+				java.util.zip.ZipEntry entry = new java.util.zip.ZipEntry(track.getFileName().toString());
+				zos.putNextEntry(entry);
+				try (java.io.InputStream in = java.nio.file.Files.newInputStream(track)) {
+					int len;
+					while ((len = in.read(buffer)) != -1) {
+						zos.write(buffer, 0, len);
+					}
+				}
+				zos.closeEntry();
+			}
+			zos.finish();
+		} catch (IOException e) {
+			logger.error("Error streaming zip for playlist {}", id, e);
+			response.reset();
+			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
 		}
 	}
 }

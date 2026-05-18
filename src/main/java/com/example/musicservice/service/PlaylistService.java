@@ -207,6 +207,21 @@ public class PlaylistService {
 		logger.info("Playlist saved to M3U file: {}", filePath);
 	}
 
+	/**
+	 * Return a list of file Paths for the songs in the playlist.
+	 * This is used by the controller to stream a ZIP archive of the playlist.
+	 */
+	public java.util.List<Path> getFilesForPlaylist(Long playlistId) {
+		Playlist playlist = playlistRepository.findById(playlistId)
+				.orElseThrow(() -> new ResourceNotFoundException("Playlist not found with id: " + playlistId));
+
+		return playlist.getSongs().stream()
+				.map(song -> Path.of(song.getFilePath()))
+				.filter(p -> Files.exists(p) && Files.isRegularFile(p))
+				.collect(Collectors.toList());
+	}
+
+
 	private void deletePlaylistFile(Long playlistId) {
 		try {
 			Playlist playlist = playlistRepository.findById(playlistId).orElse(null);
