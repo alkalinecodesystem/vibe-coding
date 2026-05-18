@@ -1,9 +1,17 @@
 package com.example.musicservice.controller;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,16 +29,18 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/playlists")
 @RequiredArgsConstructor
 public class PlaylistZipController {
+    private static final Logger logger = LoggerFactory.getLogger(PlaylistZipController.class);
 
     private final PlaylistService playlistService;
 
     @GetMapping("/{id}/download-advanced")
     @ResponseBody
     public void downloadPlaylistZipAdvanced(@PathVariable Long id, HttpServletResponse response) throws IOException {
-        PlaylistResponse playlist = playlistService.getPlaylistById(id);
+        logger.info("Downloading playlist {} as zip", id);
+        com.example.musicservice.dto.PlaylistResponse playlist = playlistService.getPlaylistById(id);
         List<Path> tracks = playlistService.getFilesForPlaylist(id);
 
-        // Build M3U content inside ZIP
+        // Build M3U with playlist metadata
         StringBuilder m3u = new StringBuilder();
         m3u.append("#EXTM3U\n");
         m3u.append("#PLAYLIST:").append(playlist.getName()).append("\n");
@@ -38,22 +48,24 @@ public class PlaylistZipController {
             m3u.append("#DESCRIPTION:").append(playlist.getDescription()).append("\n");
         }
         m3u.append("#CREATED:").append(playlist.getCreatedAt()).append("\n");
-        for (PlaylistResponse.SongSummary s : playlist.getSongs()) {
-            String artist = s.getOriginalArtist();
-            String displayInfo = (artist != null ? artist + " - " : "") + s.getTitle();
-            m3u.append("#EXTINF:-1,").append(displayInfo).append("\n");
-            m3u.append(s.getFilePath()).append("\n");
-        }
+		for (com.example.musicservice.dto.PlaylistResponse.SongSummary s : playlist.getSongs()) {
+				String artist = s.getOriginalArtist();
+				String displayInfo = (artist != null ? artist + " - " : "") + s.getTitle();
+				m3u.append("#EXTINF:-1,").append(displayInfo).append("\n");
+				String fp = s.getFilePath();
+				String fileName = (fp != null && !fp.isEmpty()) ? java.nio.file.Paths.get(fp).getFileName().toString() : "";
+				m3u.append(fileName).append("\n");
+			}
         byte[] m3uBytes = m3u.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8);
 
         response.setContentType("application/zip");
-        response.setHeader("Content-Disposition", "attachment; filename=\"playlist-" + id + ".zip\"");
+        response.setHeader("Content-Disposition", "attachment; filename=\"playlist-" + playlist.getName() + ".zip\"");
 
-        try (java.util.zip.ZipOutputStream zos = new java.util.zip.ZipOutputStream(response.getOutputStream())) {
+        try (ZipOutputStream zos = new ZipOutputStream(response.getOutputStream())) {
             byte[] buffer = new byte[8192];
-            java.util.Map<String, Integer> nameCounts = new java.util.HashMap<>();
+            Map<String, Integer> nameCounts = new HashMap<>();
             for (Path track : tracks) {
-                if (track == null || !java.nio.file.Files.exists(track) || !java.nio.file.Files.isRegularFile(track)) continue;
+                if (track == null || !Files.exists(track) || !Files.isRegularFile(track)) continue;
                 String originalName = track.getFileName().toString();
                 int count = nameCounts.getOrDefault(originalName, 0);
                 String entryName = originalName;
@@ -64,9 +76,9 @@ public class PlaylistZipController {
                     entryName = base + "_" + count + ext;
                 }
                 nameCounts.put(originalName, count + 1);
-                java.util.zip.ZipEntry entry = new java.util.zip.ZipEntry(entryName);
+                ZipEntry entry = new ZipEntry(entryName);
                 zos.putNextEntry(entry);
-                try (java.io.InputStream in = java.nio.file.Files.newInputStream(track)) {
+                try (InputStream in = Files.newInputStream(track)) {
                     int len;
                     while ((len = in.read(buffer)) != -1) {
                         zos.write(buffer, 0, len);
@@ -74,14 +86,13 @@ public class PlaylistZipController {
                 }
                 zos.closeEntry();
             }
-            java.util.zip.ZipEntry m3uEntry = new java.util.zip.ZipEntry("playlist-" + id + ".m3u");
+            ZipEntry m3uEntry = new ZipEntry("playlist-" + playlist.getName() + ".m3u");
             zos.putNextEntry(m3uEntry);
             zos.write(m3uBytes);
             zos.closeEntry();
             zos.finish();
         } catch (IOException e) {
-            // Minimal error handling: log to stderr to keep it self-contained
-            System.err.println("Error streaming zip for playlist " + id + ": " + e.getMessage());
+            logger.error("Error streaming zip for playlist {}", id, e);
             response.reset();
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
         }

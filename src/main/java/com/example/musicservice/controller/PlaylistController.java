@@ -162,7 +162,7 @@ public class PlaylistController {
                 }
                 zos.closeEntry();
             }
-            ZipEntry m3uEntry = new ZipEntry("playlist-" + id + ".m3u");
+            ZipEntry m3uEntry = new ZipEntry("playlist-" + playlist.getName() + ".m3u");
             zos.putNextEntry(m3uEntry);
             zos.write(m3uBytes);
             zos.closeEntry();
