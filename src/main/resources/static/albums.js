@@ -1,4 +1,3 @@
-console.log('albums.js loaded');
 
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('search-input');
@@ -6,10 +5,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const matchingCountSpan = document.getElementById('matching-count');
     const totalCountSpan = document.getElementById('total-count');
     const albumCards = document.querySelectorAll('.col-md-3.col-sm-6.mb-4');
-
-
-                    // Setup player controls after modal is shown
-                    setupPlayerControls();
                     
     // Store original album data
     const albumsData = Array.from(albumCards).map(card => {
@@ -248,6 +243,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.error('Modal element not found!');
                     alert('Modal not found. Please refresh the page.');
                 }
+
+                // Setup player controls after modal is shown
+                setupPlayerControls();
 
             } catch (err) {
                 console.error('Error fetching album details:', err);
