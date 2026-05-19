@@ -32,7 +32,7 @@ public class PlaylistZipController {
 
     private final PlaylistService playlistService;
 
-    @GetMapping("/{id}/download-advanced")
+    @GetMapping("/{id}/download")
     @ResponseBody
     public void downloadPlaylistZipAdvanced(@PathVariable Long id, HttpServletResponse response) throws IOException {
         logger.info("Downloading playlist {} as zip", id);

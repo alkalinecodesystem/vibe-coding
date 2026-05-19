@@ -77,6 +77,9 @@
 							th:data-album-title="${album.title}" th:data-album-artist="${album.artistName}">
 							<i class="bi bi-play-circle"></i> Play Album
 						</button>
+						<a th:href="@{/api/albums/{id}/download(id=${album.id})}" class="btn btn-sm btn-outline-primary">
+							Download ZIP
+						</a>
 					</div>
 				</div>
 			</div>
