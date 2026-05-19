@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.example.musicservice.dto.PlaylistResponse;
 import com.example.musicservice.service.PlaylistService;
 
 import jakarta.servlet.http.HttpServletResponse;

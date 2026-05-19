@@ -81,9 +81,9 @@ public class SongService {
 		if (StringUtils.hasText(q)) {
 			if ("title".equals(type)) {
 				songPage = songRepository.findByTitleContainingIgnoreCase(q, pageable);
-			} else if ("album".equals(type)) {
-				songPage = songRepository.findByAlbum_TitleContainingIgnoreCase(q, pageable);
-			} else if ("artist".equals(type)) {
+            } else if ("album".equals(type)) {
+                songPage = songRepository.findByAlbum_TitleContainingIgnoreCaseOrderByTrackNumberAsc(q, pageable);
+            } else if ("artist".equals(type)) {
 				songPage = songRepository.findByOriginalArtistContainingIgnoreCase(q, pageable);
 			} else {
 				// all fields
@@ -251,7 +251,7 @@ public class SongService {
 
 	@Transactional(readOnly = true)
 	public Page<SongViewDTO> searchSongsByAlbumForViewPaginated(String albumTitle, Pageable pageable) {
-		Page<Song> songs = songRepository.findByAlbum_TitleContainingIgnoreCase(albumTitle, pageable);
+		Page<Song> songs = songRepository.findByAlbum_TitleContainingIgnoreCaseOrderByTrackNumberAsc(albumTitle, pageable);
 		return songs.map(this::convertToViewDTO);
 	}
 
