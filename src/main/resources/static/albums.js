@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const coverImg = document.getElementById('modal-album-cover');
         if (data.hasCover && data.coverContentType && data.coverImageBase64) {
           coverImg.src = 'data:' + data.coverContentType + ';base64,' + data.coverImageBase64;
-          coverImg.style.display = 'block';
+          coverImg.style.display = 'center';
         } else {
           coverImg.style.display = 'none';
         }
