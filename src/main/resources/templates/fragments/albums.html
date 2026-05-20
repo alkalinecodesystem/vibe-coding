@@ -64,22 +64,24 @@
 				</div>
 				<div class="card-footer bg-transparent border-0">
 					<div class="d-grid gap-2">
-						<a th:href="@{'/albums/' + ${album.id}}" class="btn btn-sm btn-outline-primary">
-							View Details
-						</a>
-						<button th:if="${album.artistId}" class="btn btn-sm btn-info view-artist-btn" data-bs-toggle="modal"
+						<button class="btn btn-sm btn-outline-primary"
+                            th:onclick="|window.location.href='/albums/' + ${album.id}|">
+                            <i class="bi bi-eye"></i> View Details
+                        </button>
+						<button th:if="${album.artistId}" class="btn btn-sm btn-outline-primary view-artist-btn" data-bs-toggle="modal"
 							data-bs-target="#artistModal" th:data-artist-id="${album.artistId}"
 							th:data-artist-name="${album.artistName}">
 							<i class="bi bi-person"></i> View Artist
 						</button>
-						<button class="btn btn-sm btn-success play-album-btn" data-bs-toggle="modal"
+						<button class="btn btn-sm btn-outline-primary play-album-btn" data-bs-toggle="modal"
 							data-bs-target="#albumModal" th:data-album-id="${album.id}"
 							th:data-album-title="${album.title}" th:data-album-artist="${album.artistName}">
 							<i class="bi bi-play-circle"></i> Play Album
-						</button>
-						<a th:href="@{/api/albums/{id}/download(id=${album.id})}" class="btn btn-sm btn-outline-primary">
-							Download ZIP
-						</a>
+						</button>	
+						<button class="btn btn-sm btn-outline-primary"
+                             th:onclick="|window.location.href='@{/api/albums/{id}/download(id=${album.id})}'|">
+                             <i class="bi bi-file-earmark-zip"></i> Download ZIP
+                        </button>
 					</div>
 				</div>
 			</div>
