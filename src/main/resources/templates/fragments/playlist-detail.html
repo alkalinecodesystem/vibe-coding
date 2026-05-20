@@ -286,5 +286,18 @@
 		</div>
 	</div>
 
-	<script th:src="@{/playlist-detail.js}"></script>
-</div>
+ 	<script th:src="@{/playlist-detail.js}"></script>
+ 	<script>
+ 		(function() {
+ 			function reinitPlaylistScripts() {
+ 				if (typeof initPlaylistDetail === 'function') { try { initPlaylistDetail(); } catch (e) {} }
+ 			}
+ 			document.addEventListener('DOMContentLoaded', function() {
+ 				['addSongsModal', 'playPlaylistModal', 'deleteSongModal', 'savePlaylistModal'].forEach(function(id) {
+ 					var m = document.getElementById(id);
+ 					if (m) m.addEventListener('show.bs.modal', reinitPlaylistScripts);
+ 				});
+ 			});
+ 		})();
+ 	</script>
+ </div>

@@ -1,40 +1,45 @@
-const viewArtistButtons = document.querySelectorAll('.view-artist-btn');
-viewArtistButtons.forEach(button => {
-    button.addEventListener('click', async function (event) {
-        currentArtistTriggerButton = this;
+let currentArtistTriggerButton = null;
 
-        const artistId = this.getAttribute('data-artist-id');
-        const artistName = this.getAttribute('data-artist-name');
+function initArtist() {
+	const viewArtistButtons = document.querySelectorAll('.view-artist-btn');
+	viewArtistButtons.forEach(button => {
+		if (button.dataset.artistListenerAttached === 'true') return;
+		button.dataset.artistListenerAttached = 'true';
+		button.addEventListener('click', async function (event) {
+			currentArtistTriggerButton = this;
 
-        if (!artistId) {
-            alert('Error: No artist ID found.');
-            // Close the modal
-            const modal = bootstrap.Modal.getInstance(document.getElementById('artistModal'));
-            if (modal) modal.hide();
-            return;
-        }
+			const artistId = this.getAttribute('data-artist-id');
+			const artistName = this.getAttribute('data-artist-name');
 
-        try {
-            // Fetch artist details
-            const response = await fetch(`/api/artists/${artistId}`);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
+			if (!artistId) {
+				alert('Error: No artist ID found.');
+				// Close the modal
+				const modal = bootstrap.Modal.getInstance(document.getElementById('artistModal'));
+				if (modal) modal.hide();
+				return;
+			}
 
-            const responseJson = await response.json();
-            const artist = responseJson.data;
+			try {
+				// Fetch artist details
+				const response = await fetch(`/api/artists/${artistId}`);
+				if (!response.ok) {
+					throw new Error(`HTTP error! status: ${response.status}`);
+				}
 
-            if (!artist) {
-                alert('No artist data received from the server.');
-                const modal = bootstrap.Modal.getInstance(document.getElementById('artistModal'));
-                if (modal) modal.hide();
-                return;
-            }
+				const responseJson = await response.json();
+				const artist = responseJson.data;
 
-            // Populate modal
-            const artistInfoDiv = document.getElementById('artist-info');
-            const biographyText = artist.biography || '';
-            artistInfoDiv.innerHTML = `
+				if (!artist) {
+					alert('No artist data received from the server.');
+					const modal = bootstrap.Modal.getInstance(document.getElementById('artistModal'));
+					if (modal) modal.hide();
+					return;
+				}
+
+				// Populate modal
+				const artistInfoDiv = document.getElementById('artist-info');
+				const biographyText = artist.biography || '';
+				artistInfoDiv.innerHTML = `
                    <div class="row">
                        <div class="col-md-12">
                            <h4>${artist.name}</h4>
@@ -49,11 +54,11 @@ viewArtistButtons.forEach(button => {
                                <h5>Albums</h5>
                                <ul class="list-group">
                                ${artist.albums && artist.albums.length > 0 ? (() => {
-                    const randomAlbums = artist.albums.sort(() => 0.5 - Math.random()).slice(0, 5);
-                    return randomAlbums.map(album => `<li class="list-group-item">
+					const randomAlbums = artist.albums.sort(() => 0.5 - Math.random()).slice(0, 5);
+					return randomAlbums.map(album => `<li class="list-group-item">
                                      <strong>${album.title}</strong> ${album.releaseYear ? `(${album.releaseYear})` : ''}
                                    </li>`).join('');
-                })() : '<li class="list-group-item text-muted">No albums found</li>'}
+				})() : '<li class="list-group-item text-muted">No albums found</li>'}
                                </ul>
                            </div>
                            <div class="d-flex justify-content-end">
@@ -64,74 +69,77 @@ viewArtistButtons.forEach(button => {
                    </div>
                `;
 
-            // Setup biography textarea character counter
-            const biographyTextarea = document.getElementById('artist-biography');
-            const charCountElement = document.getElementById('biography-char-count');
+				// Setup biography textarea character counter
+				const biographyTextarea = document.getElementById('artist-biography');
+				const charCountElement = document.getElementById('biography-char-count');
 
-            biographyTextarea.addEventListener('input', function () {
-                const currentLength = this.value.length;
-                charCountElement.textContent = `${currentLength}/1000 characters`;
+				biographyTextarea.addEventListener('input', function () {
+					const currentLength = this.value.length;
+					charCountElement.textContent = `${currentLength}/1000 characters`;
 
-                // Change color when approaching limit
-                if (currentLength > 900) {
-                    charCountElement.className = 'text-warning';
-                } else if (currentLength > 950) {
-                    charCountElement.className = 'text-danger';
-                } else {
-                    charCountElement.className = 'text-muted';
-                }
-            });
+					// Change color when approaching limit
+					if (currentLength > 900) {
+						charCountElement.className = 'text-warning';
+					} else if (currentLength > 950) {
+						charCountElement.className = 'text-danger';
+					} else {
+						charCountElement.className = 'text-muted';
+					}
+				});
 
-            // Setup save button
-            document.getElementById('save-artist-btn').addEventListener('click', async function () {
-                const biography = document.getElementById('artist-biography').value;
-                try {
-                    const updateResponse = await fetch(`/api/artists/${artistId}`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            name: artist.name,
-                            biography: biography
-                        })
-                    });
+				// Setup save button
+				document.getElementById('save-artist-btn').addEventListener('click', async function () {
+					const biography = document.getElementById('artist-biography').value;
+					try {
+						const updateResponse = await fetch(`/api/artists/${artistId}`, {
+							method: 'PUT',
+							headers: {
+								'Content-Type': 'application/json'
+							},
+							body: JSON.stringify({
+								name: artist.name,
+								biography: biography
+							})
+						});
 
-                    if (!updateResponse.ok) {
-                        throw new Error(`HTTP error! status: ${updateResponse.status}`);
-                    }
+						if (!updateResponse.ok) {
+							throw new Error(`HTTP error! status: ${updateResponse.status}`);
+						}
 
-                    // Close modal
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('artistModal'));
-                    modal.hide();
-                } catch (err) {
-                    alert('Error updating artist: ' + err.message);
-                }
-            });
+						// Close modal
+						const modal = bootstrap.Modal.getInstance(document.getElementById('artistModal'));
+						modal.hide();
+					} catch (err) {
+						alert('Error updating artist: ' + err.message);
+					}
+				});
 
-            // Show modal
-            const modalElement = document.getElementById('artistModal');
-            const modal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
-            modal.show();
+				// Show modal
+				const modalElement = document.getElementById('artistModal');
+				const modal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+				modal.show();
 
-            // Handle modal close
-            modalElement.addEventListener('hidden.bs.modal', function () {
-                const modalInstance = bootstrap.Modal.getInstance(modalElement);
-                if (modalInstance) {
-                    modalInstance.dispose();
-                }
-                setTimeout(() => {
-                    if (currentArtistTriggerButton && document.body.contains(currentArtistTriggerButton)) {
-                        currentArtistTriggerButton.focus();
-                    }
-                }, 100);
-            });
+				// Handle modal close
+				modalElement.addEventListener('hidden.bs.modal', function () {
+					const modalInstance = bootstrap.Modal.getInstance(modalElement);
+					if (modalInstance) {
+						modalInstance.dispose();
+					}
+					setTimeout(() => {
+						if (currentArtistTriggerButton && document.body.contains(currentArtistTriggerButton)) {
+							currentArtistTriggerButton.focus();
+						}
+					}, 100);
+				});
 
-        } catch (err) {
-            alert('Could not load artist details: ' + err.message);
-            // Close the modal if fetch failed
-            const modal = bootstrap.Modal.getInstance(document.getElementById('artistModal'));
-            if (modal) modal.hide();
-        }
-    });
-});
+			} catch (err) {
+				alert('Could not load artist details: ' + err.message);
+				// Close the modal if fetch failed
+				const modal = bootstrap.Modal.getInstance(document.getElementById('artistModal'));
+				if (modal) modal.hide();
+			}
+		});
+	});
+}
+
+initArtist();

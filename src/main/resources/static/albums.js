@@ -1,4 +1,15 @@
-document.addEventListener('DOMContentLoaded', function() {
+// Player state lives at top level (module scope) so it survives re-calls to initAlbums()
+let currentAudioPlayer = null;
+let currentSongIndex = -1;
+let currentAlbumSongs = [];
+let isPlaying = false;
+let isShuffle = false;
+let repeatMode = 'none'; // 'none' | 'all' | 'one'
+let currentVolume = 0.5;
+let currentTriggerButton = null;
+let playerControlsInitialized = false;
+
+function initAlbums() {
   const searchInput = document.getElementById('search-input');
   const resultsCount = document.getElementById('search-results-count');
   const matchingCountSpan = document.getElementById('matching-count');
@@ -42,28 +53,22 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   if (searchInput) {
-    let debounceTimer;
-    searchInput.addEventListener('input', function() {
-      clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(() => {
-        performSearch(this.value);
-      }, 150);
-    });
+    if (!searchInput.dataset.searchListenerAttached) {
+      searchInput.dataset.searchListenerAttached = 'true';
+      let debounceTimer;
+      searchInput.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+          performSearch(this.value);
+        }, 150);
+      });
+    }
   }
 
-  // Player state
-  let currentAudioPlayer = null;
-  let currentSongIndex = -1;
-  let currentAlbumSongs = [];
-  let isPlaying = false;
-  let isShuffle = false;
-  let isRepeat = false;
-  let currentVolume = 0.5;
-
   const playAlbumButtons = document.querySelectorAll('.play-album-btn');
-  let currentTriggerButton = null;
-
   playAlbumButtons.forEach(button => {
+    if (button.dataset.playAlbumListenerAttached === 'true') return;
+    button.dataset.playAlbumListenerAttached = 'true';
     button.addEventListener('click', async function () {
       currentTriggerButton = this;
       const albumId = this.getAttribute('data-album-id');
@@ -137,6 +142,16 @@ document.addEventListener('DOMContentLoaded', function() {
         const modal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
         modal.show();
 
+        // Reset repeat mode and button UI for new album
+        repeatMode = 'none';
+        const repeatBtnEl = document.getElementById('repeat-btn');
+        if (repeatBtnEl) {
+          repeatBtnEl.classList.remove('btn-primary');
+          repeatBtnEl.classList.add('btn-outline-secondary');
+          repeatBtnEl.innerHTML = '<i class="bi bi-repeat"></i>';
+          repeatBtnEl.title = 'Repeat';
+        }
+
         setupPlayerControls();
 
         modalElement.addEventListener('hidden.bs.modal', () => {
@@ -144,10 +159,11 @@ document.addEventListener('DOMContentLoaded', function() {
             currentAudioPlayer.pause();
             currentAudioPlayer = null;
           }
-          currentAlbumSongs = [];
-          isPlaying = false;
-          currentSongIndex = -1;
-          const btn = currentTriggerButton;
+            currentAlbumSongs = [];
+            isPlaying = false;
+            currentSongIndex = -1;
+            repeatMode = 'none';
+            const btn = currentTriggerButton;
           if (btn && document.body.contains(btn)) btn.focus();
         }, { once: true });
 
@@ -160,7 +176,6 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   function setupPlayerControls() {
-    const playButtons = document.querySelectorAll('.play-song-btn');
     const playPauseBtn = document.getElementById('play-pause-btn');
     const prevBtn = document.getElementById('prev-btn');
     const nextBtn = document.getElementById('next-btn');
@@ -171,61 +186,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const totalTimeEl = document.getElementById('total-time');
     const currentSongTitleEl = document.getElementById('current-song-title');
     const volumeSlider = document.getElementById('volume-slider');
-
-    if (shuffleBtn) {
-      shuffleBtn.addEventListener('click', function () {
-        isShuffle = !isShuffle;
-        this.classList.toggle('btn-primary', isShuffle);
-        this.classList.toggle('btn-outline-secondary', !isShuffle);
-        this.innerHTML = isShuffle ? '<i class="bi bi-shuffle"></i>' : '<i class="bi bi-shuffle"></i>';
-      });
-    }
-
-    if (repeatBtn) {
-      repeatBtn.addEventListener('click', function () {
-        isRepeat = !isRepeat;
-        this.classList.toggle('btn-primary', isRepeat);
-        this.classList.toggle('btn-outline-secondary', !isRepeat);
-        this.innerHTML = isRepeat ? '<i class="bi bi-repeat"></i>' : '<i class="bi bi-repeat"></i>';
-      });
-    }
-
-    playButtons.forEach(btn => {
-      btn.addEventListener('click', function () {
-        const idx = parseInt(this.getAttribute('data-song-index'));
-        playSong(idx);
-      });
-    });
-
-    if (playPauseBtn) {
-      playPauseBtn.addEventListener('click', function () {
-        if (isPlaying) {
-          pauseSong();
-        } else {
-          if (currentAudioPlayer) {
-            currentAudioPlayer.play();
-            isPlaying = true;
-            this.innerHTML = '<i class="bi bi-pause-fill"></i>';
-          } else if (currentAlbumSongs.length > 0) {
-            playSong(0);
-          }
-        }
-      });
-    }
-
-    if (prevBtn) {
-      prevBtn.addEventListener('click', function () {
-        const newIndex = isShuffle ? getRandomSongIndex() : (currentSongIndex > 0 ? currentSongIndex - 1 : currentAlbumSongs.length - 1);
-        playSong(newIndex);
-      });
-    }
-
-    if (nextBtn) {
-      nextBtn.addEventListener('click', function () {
-        const newIndex = isShuffle ? getRandomSongIndex() : (currentSongIndex < currentAlbumSongs.length - 1 ? currentSongIndex + 1 : 0);
-        playSong(newIndex);
-      });
-    }
 
     function getRandomSongIndex() {
       if (currentAlbumSongs.length <= 1) return 0;
@@ -245,7 +205,8 @@ document.addEventListener('DOMContentLoaded', function() {
       currentSongIndex = songIndex;
       const song = currentAlbumSongs[songIndex];
 
-      playButtons.forEach((b, idx) => {
+      // Always query fresh DOM elements so this works even when called from a setupPlayerControls() that ran for a previous album
+      document.querySelectorAll('#modal-song-list .play-song-btn').forEach((b, idx) => {
         b.innerHTML = idx === songIndex ? '<i class="bi bi-pause-circle"></i>' : '<i class="bi bi-play-circle"></i>';
       });
 
@@ -268,12 +229,32 @@ document.addEventListener('DOMContentLoaded', function() {
       });
 
       currentAudioPlayer.addEventListener('ended', function () {
-        if (isRepeat) {
+        if (repeatMode === 'one') {
+          // Repeat current song only
           currentAudioPlayer.currentTime = 0;
           currentAudioPlayer.play();
-        } else {
+        } else if (repeatMode === 'all') {
+          // Repeat entire album (loop all songs)
           const nextIndex = isShuffle ? getRandomSongIndex() : (currentSongIndex + 1) % currentAlbumSongs.length;
           playSong(nextIndex);
+        } else {
+          // No repeat: play next, stop after last song
+          let nextIndex;
+          if (isShuffle) {
+            nextIndex = getRandomSongIndex();
+          } else {
+            nextIndex = currentSongIndex < currentAlbumSongs.length - 1 ? currentSongIndex + 1 : 0;
+          }
+          if (nextIndex === 0 && currentSongIndex === currentAlbumSongs.length - 1 && !isShuffle) {
+            // Reached end of album, stop playing
+            isPlaying = false;
+            if (playPauseBtn) playPauseBtn.innerHTML = '<i class="bi bi-play-fill"></i>';
+            document.querySelectorAll('#modal-song-list .play-song-btn').forEach(b => {
+              b.innerHTML = '<i class="bi bi-play-circle"></i>';
+            });
+          } else {
+            playSong(nextIndex);
+          }
         }
       });
 
@@ -306,19 +287,105 @@ document.addEventListener('DOMContentLoaded', function() {
       return m + ':' + (s < 10 ? '0' : '') + s;
     }
 
-    const progressContainer = progressBar.parentElement;
-    progressContainer.addEventListener('click', function (e) {
-      if (currentAudioPlayer && currentAudioPlayer.duration) {
-        const rect = this.getBoundingClientRect();
-        const clickX = e.clientX - rect.left;
-        const percentage = clickX / rect.width;
-        currentAudioPlayer.currentTime = percentage * currentAudioPlayer.duration;
-      }
+    // Attach to song buttons inside the modal (these are recreated on every album load -> attach every time)
+    const playButtons = document.querySelectorAll('.play-song-btn');
+    playButtons.forEach(btn => {
+      btn.addEventListener('click', function () {
+        const idx = parseInt(this.getAttribute('data-song-index'));
+        playSong(idx);
+      });
     });
 
-    volumeSlider.addEventListener('input', function () {
-      currentVolume = this.value / 100;
-      if (currentAudioPlayer) currentAudioPlayer.volume = currentVolume;
-    });
+    if (!playerControlsInitialized) {
+      playerControlsInitialized = true;
+
+      if (shuffleBtn) {
+        shuffleBtn.addEventListener('click', function () {
+          isShuffle = !isShuffle;
+          this.classList.toggle('btn-primary', isShuffle);
+          this.classList.toggle('btn-outline-secondary', !isShuffle);
+          this.innerHTML = isShuffle ? '<i class="bi bi-shuffle"></i>' : '<i class="bi bi-shuffle"></i>';
+        });
+      }
+
+      if (repeatBtn) {
+        repeatBtn.addEventListener('click', function () {
+          if (repeatMode === 'none') {
+            repeatMode = 'all';
+            this.classList.add('btn-primary');
+            this.classList.remove('btn-outline-secondary');
+            this.innerHTML = '<i class="bi bi-repeat"></i>';
+            this.title = 'Repeat album';
+          } else if (repeatMode === 'all') {
+            repeatMode = 'one';
+            this.innerHTML = '<i class="bi bi-repeat-1"></i>';
+            this.title = 'Repeat current song';
+          } else {
+            repeatMode = 'none';
+            this.classList.remove('btn-primary');
+            this.classList.add('btn-outline-secondary');
+            this.innerHTML = '<i class="bi bi-repeat"></i>';
+            this.title = 'Repeat';
+          }
+        });
+      }
+
+      if (playPauseBtn) {
+        playPauseBtn.addEventListener('click', function () {
+          if (isPlaying) {
+            pauseSong();
+          } else {
+            if (currentAudioPlayer) {
+              currentAudioPlayer.play();
+              isPlaying = true;
+              this.innerHTML = '<i class="bi bi-pause-fill"></i>';
+            } else if (currentAlbumSongs.length > 0) {
+              playSong(0);
+            }
+          }
+        });
+      }
+
+      if (prevBtn) {
+        prevBtn.addEventListener('click', function () {
+          const newIndex = isShuffle ? getRandomSongIndex() : (currentSongIndex > 0 ? currentSongIndex - 1 : currentAlbumSongs.length - 1);
+          playSong(newIndex);
+        });
+      }
+
+      if (nextBtn) {
+        nextBtn.addEventListener('click', function () {
+          const newIndex = isShuffle ? getRandomSongIndex() : (currentSongIndex < currentAlbumSongs.length - 1 ? currentSongIndex + 1 : 0);
+          playSong(newIndex);
+        });
+      }
+
+      const progressContainer = progressBar.parentElement;
+      progressContainer.addEventListener('click', function (e) {
+        if (currentAudioPlayer && currentAudioPlayer.duration) {
+          const rect = this.getBoundingClientRect();
+          const clickX = e.clientX - rect.left;
+          const percentage = clickX / rect.width;
+          currentAudioPlayer.currentTime = percentage * currentAudioPlayer.duration;
+        }
+      });
+
+      if (volumeSlider) {
+        volumeSlider.addEventListener('input', function () {
+          currentVolume = this.value / 100;
+          if (currentAudioPlayer) currentAudioPlayer.volume = currentVolume;
+        });
+      }
+
+      // Ensure initial visual state of repeat button (first time controls are initialized)
+      if (repeatBtn) {
+        repeatBtn.classList.remove('btn-primary');
+        repeatBtn.classList.add('btn-outline-secondary');
+        repeatBtn.innerHTML = '<i class="bi bi-repeat"></i>';
+        repeatBtn.title = 'Repeat';
+      }
+    }
   }
-});
+}
+
+initAlbums();

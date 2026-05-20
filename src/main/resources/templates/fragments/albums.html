@@ -180,7 +180,22 @@
 			</div>
 		</div>
 	</div>
-	<script th:src="@{/albums.js}"></script>
-	<script th:src="@{/artist.js}"></script>
-</div>
+ 	<script th:src="@{/albums.js}"></script>
+ 	<script th:src="@{/artist.js}"></script>
+ 	<script>
+ 		(function() {
+ 			function reinitScripts() {
+ 				if (typeof initAlbums === 'function') { try { initAlbums(); } catch (e) {} }
+ 				if (typeof initArtist === 'function') { try { initArtist(); } catch (e) {} }
+ 			}
+ 			document.addEventListener('DOMContentLoaded', function() {
+ 				var albumModal = document.getElementById('albumModal');
+ 				var artistModal = document.getElementById('artistModal');
+ 				if (albumModal) albumModal.addEventListener('show.bs.modal', reinitScripts);
+ 				if (artistModal) artistModal.addEventListener('show.bs.modal', reinitScripts);
+ 			});
+ 		})();
+ 	</script>
+ </div>
+
 

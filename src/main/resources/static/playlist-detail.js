@@ -5,10 +5,12 @@ let playlistCurrentAudioPlayer = null;
 let playlistCurrentSongIndex = -1;
 let playlistIsPlaying = false;
 let playlistIsShuffle = false;
-let playlistIsRepeat = false;
+let playlistRepeatMode = 'none'; // 'none' | 'all' | 'one'
 let playlistCurrentVolume = 0.5;
 let deleteSongPlaylistId = null;
 let deleteSongId = null;
+let playlistPlayerControlsInitialized = false;
+let selectedSongs = new Set(); // for bulk add UI (currently unused in template but prevents ReferenceError)
 
 // Pagination variables for add songs modal
 let currentPage = 0;
@@ -16,7 +18,7 @@ let pageSize = 10;
 let totalPages = 0;
 let currentSearchQuery = '';
 
-document.addEventListener('DOMContentLoaded', function() {
+function initPlaylistDetail() {
     // Get playlist ID from URL or data attribute
     const playlistCard = document.querySelector('[data-playlist-id]');
     if (playlistCard) {
@@ -30,24 +32,27 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Setup song search functionality
+    // Setup song search functionality (guard to support re-init)
     const songSearch = document.getElementById('songSearch');
-    if (songSearch) {
+    if (songSearch && !songSearch.dataset.playlistSearchListener) {
+        songSearch.dataset.playlistSearchListener = 'true';
         songSearch.addEventListener('input', debounce(searchSongs, 300));
     }
 
-    // Setup size selector
+    // Setup size selector (guarded)
     const sizeSelect = document.getElementById('sizeSelect');
-    if (sizeSelect) {
+    if (sizeSelect && !sizeSelect.dataset.playlistSizeListener) {
+        sizeSelect.dataset.playlistSizeListener = 'true';
         sizeSelect.addEventListener('change', function() {
             pageSize = parseInt(this.value);
             loadSongsForAdding(currentSearchQuery, 0);
         });
     }
 
-    // Load initial songs when modal is shown
+    // Load initial songs when modal is shown (attach only once)
     const addSongsModal = document.getElementById('addSongsModal');
-    if (addSongsModal) {
+    if (addSongsModal && !addSongsModal.dataset.playlistModalListeners) {
+        addSongsModal.dataset.playlistModalListeners = 'true';
         addSongsModal.addEventListener('shown.bs.modal', function() {
             loadSongsForAdding('', 0);
         });
@@ -58,9 +63,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Setup play playlist modal
+    // Setup play playlist modal (attach only once)
     const playPlaylistModal = document.getElementById('playPlaylistModal');
-    if (playPlaylistModal) {
+    if (playPlaylistModal && !playPlaylistModal.dataset.playlistModalListeners) {
+        playPlaylistModal.dataset.playlistModalListeners = 'true';
         
         playPlaylistModal.addEventListener('shown.bs.modal', function() {
             loadPlaylistForPlaying();
@@ -76,9 +82,12 @@ document.addEventListener('DOMContentLoaded', function() {
             playlistIsPlaying = false;
             playlistCurrentSongIndex = -1;
             playlistSongs = [];
+            playlistRepeatMode = 'none';
         });
     }
-});
+}
+
+initPlaylistDetail();
 
 // savePlaylist function is now handled by the modal - this function is kept for backward compatibility but should not be used
 
@@ -304,6 +313,16 @@ function setupPlaylistPlayer(playlistData) {
     playlistSongs = playlistData.songs || [];
     playlistCurrentSongIndex = -1;
 
+    // Reset repeat mode and UI when loading a (new) playlist
+    playlistRepeatMode = 'none';
+    const repeatBtnEl = document.getElementById('playlist-repeat-btn');
+    if (repeatBtnEl) {
+        repeatBtnEl.classList.remove('btn-primary');
+        repeatBtnEl.classList.add('btn-outline-secondary');
+        repeatBtnEl.innerHTML = '<i class="bi bi-repeat"></i>';
+        repeatBtnEl.title = 'Repeat';
+    }
+
     // Build song list in modal
     const songListContainer = document.getElementById('playlist-modal-song-list');
     songListContainer.innerHTML = '';
@@ -359,7 +378,6 @@ function setupPlaylistPlayer(playlistData) {
 }
 
 function setupPlaylistPlayerControls() {
-    const playButtons = document.querySelectorAll('.playlist-play-song-btn');
     const playPauseBtn = document.getElementById('playlist-play-pause-btn');
     const prevBtn = document.getElementById('playlist-prev-btn');
     const nextBtn = document.getElementById('playlist-next-btn');
@@ -370,65 +388,6 @@ function setupPlaylistPlayerControls() {
     const totalTimeEl = document.getElementById('playlist-total-time');
     const playlistCurrentSongTitleEl = document.getElementById('playlist-current-song-title');
     const volumeSlider = document.getElementById('playlist-volume-slider');
-
-    // Shuffle toggle
-    shuffleBtn.addEventListener('click', function() {
-        playlistIsShuffle = !playlistIsShuffle;
-        this.classList.toggle('btn-primary', playlistIsShuffle);
-        this.classList.toggle('btn-outline-secondary', !playlistIsShuffle);
-    });
-
-    // Repeat toggle
-    repeatBtn.addEventListener('click', function() {
-        playlistIsRepeat = !playlistIsRepeat;
-        this.classList.toggle('btn-primary', playlistIsRepeat);
-        this.classList.toggle('btn-outline-secondary', !playlistIsRepeat);
-    });
-
-    // Play specific song
-    playButtons.forEach(btn => {
-        btn.addEventListener('click', function() {
-            const songIndex = parseInt(this.getAttribute('data-song-index'));
-            playPlaylistSong(songIndex);
-        });
-    });
-
-    // Play/Pause toggle
-    playPauseBtn.addEventListener('click', function() {
-        if (playlistIsPlaying) {
-            pausePlaylistSong();
-        } else {
-            if (playlistCurrentAudioPlayer) {
-                playlistCurrentAudioPlayer.play();
-                playlistIsPlaying = true;
-                this.innerHTML = '<i class="bi bi-pause-fill"></i>';
-            } else if (playlistSongs.length > 0) {
-                playPlaylistSong(0);
-            }
-        }
-    });
-
-    // Previous song
-    prevBtn.addEventListener('click', function() {
-        let newIndex;
-        if (playlistIsShuffle) {
-            newIndex = getRandomPlaylistSongIndex();
-        } else {
-            newIndex = playlistCurrentSongIndex > 0 ? playlistCurrentSongIndex - 1 : playlistSongs.length - 1;
-        }
-        playPlaylistSong(newIndex);
-    });
-
-    // Next song
-    nextBtn.addEventListener('click', function() {
-        let newIndex;
-        if (playlistIsShuffle) {
-            newIndex = getRandomPlaylistSongIndex();
-        } else {
-            newIndex = playlistCurrentSongIndex < playlistSongs.length - 1 ? playlistCurrentSongIndex + 1 : 0;
-        }
-        playPlaylistSong(newIndex);
-    });
 
     function getRandomPlaylistSongIndex() {
         if (playlistSongs.length <= 1) return 0;
@@ -452,8 +411,8 @@ function setupPlaylistPlayerControls() {
         console.log('Playing song:', song);
         console.log('File path:', song.filePath);
 
-        // Update UI
-        playButtons.forEach((btn, idx) => {
+        // Update UI - always query fresh to support multiple setups
+        document.querySelectorAll('.playlist-play-song-btn').forEach((btn, idx) => {
             btn.innerHTML = idx === songIndex ? '<i class="bi bi-pause-circle"></i>' : '<i class="bi bi-play-circle"></i>';
         });
 
@@ -493,12 +452,21 @@ function setupPlaylistPlayerControls() {
         });
 
         playlistCurrentAudioPlayer.addEventListener('ended', function() {
-            if (playlistIsRepeat) {
-                // Repeat current song
+            if (playlistRepeatMode === 'one') {
+                // Repeat current song only
                 playlistCurrentAudioPlayer.currentTime = 0;
                 playlistCurrentAudioPlayer.play();
+            } else if (playlistRepeatMode === 'all') {
+                // Repeat entire playlist (loop all songs)
+                let nextIndex;
+                if (playlistIsShuffle) {
+                    nextIndex = getRandomPlaylistSongIndex();
+                } else {
+                    nextIndex = (playlistCurrentSongIndex + 1) % playlistSongs.length;
+                }
+                playPlaylistSong(nextIndex);
             } else {
-                // Auto-play next song
+                // No repeat: Auto-play next song (stop after last song)
                 let nextIndex;
                 if (playlistIsShuffle) {
                     nextIndex = getRandomPlaylistSongIndex();
@@ -509,7 +477,7 @@ function setupPlaylistPlayerControls() {
                     // Reached end of playlist, stop playing
                     playlistIsPlaying = false;
                     playPauseBtn.innerHTML = '<i class="bi bi-play-fill"></i>';
-                    playButtons.forEach(btn => btn.innerHTML = '<i class="bi bi-play-circle"></i>');
+                    document.querySelectorAll('.playlist-play-song-btn').forEach(btn => btn.innerHTML = '<i class="bi bi-play-circle"></i>');
                 } else {
                     playPlaylistSong(nextIndex);
                 }
@@ -530,7 +498,7 @@ function setupPlaylistPlayerControls() {
             console.error('Audio error:', e);
             alert('Error loading audio file. The file may not exist or be inaccessible.');
             // Reset play button state
-            playButtons.forEach(btn => btn.innerHTML = '<i class="bi bi-play-circle"></i>');
+            document.querySelectorAll('.playlist-play-song-btn').forEach(btn => btn.innerHTML = '<i class="bi bi-play-circle"></i>');
             playPauseBtn.innerHTML = '<i class="bi bi-play-fill"></i>';
             playlistIsPlaying = false;
         });
@@ -540,7 +508,7 @@ function setupPlaylistPlayerControls() {
             console.error('Play failed:', e);
             alert('Could not play audio file. Please check that the file exists and is accessible.');
             // Reset play button state
-            playButtons.forEach(btn => btn.innerHTML = '<i class="bi bi-play-circle"></i>');
+            document.querySelectorAll('.playlist-play-song-btn').forEach(btn => btn.innerHTML = '<i class="bi bi-play-circle"></i>');
             playPauseBtn.innerHTML = '<i class="bi bi-play-fill"></i>';
             playlistIsPlaying = false;
         });
@@ -592,25 +560,124 @@ function setupPlaylistPlayerControls() {
         }
     }
 
-    // Click on progress bar to seek
-    const progressContainer = progressBar.parentElement;
-    progressContainer.addEventListener('click', function(e) {
-        if (playlistCurrentAudioPlayer && playlistCurrentAudioPlayer.duration) {
-            const rect = this.getBoundingClientRect();
-            const clickX = e.clientX - rect.left;
-            const percentage = clickX / rect.width;
-            playlistCurrentAudioPlayer.currentTime = percentage * playlistCurrentAudioPlayer.duration;
-        }
+    // Always attach to song play buttons (they are recreated each time the playlist is loaded into the modal)
+    const playButtons = document.querySelectorAll('.playlist-play-song-btn');
+    playButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const songIndex = parseInt(this.getAttribute('data-song-index'));
+            playPlaylistSong(songIndex);
+        });
     });
 
-    // Volume slider
-    volumeSlider.addEventListener('input', function() {
-        playlistCurrentVolume = this.value / 100;
-        if (playlistCurrentAudioPlayer) {
-            playlistCurrentAudioPlayer.volume = playlistCurrentVolume;
-        }
-    });
+    if (!playlistPlayerControlsInitialized) {
+        playlistPlayerControlsInitialized = true;
 
+        // Shuffle toggle
+        if (shuffleBtn) {
+            shuffleBtn.addEventListener('click', function() {
+                playlistIsShuffle = !playlistIsShuffle;
+                this.classList.toggle('btn-primary', playlistIsShuffle);
+                this.classList.toggle('btn-outline-secondary', !playlistIsShuffle);
+            });
+        }
+
+        // Repeat mode cycle: none → all (playlist loop) → one (current song) → none
+        if (repeatBtn) {
+            repeatBtn.addEventListener('click', function() {
+                if (playlistRepeatMode === 'none') {
+                    playlistRepeatMode = 'all';
+                    this.classList.add('btn-primary');
+                    this.classList.remove('btn-outline-secondary');
+                    this.innerHTML = '<i class="bi bi-repeat"></i>';
+                    this.title = 'Repeat playlist';
+                } else if (playlistRepeatMode === 'all') {
+                    playlistRepeatMode = 'one';
+                    this.innerHTML = '<i class="bi bi-repeat-1"></i>';
+                    this.title = 'Repeat current song';
+                } else {
+                    playlistRepeatMode = 'none';
+                    this.classList.remove('btn-primary');
+                    this.classList.add('btn-outline-secondary');
+                    this.innerHTML = '<i class="bi bi-repeat"></i>';
+                    this.title = 'Repeat';
+                }
+            });
+        }
+
+        // Play/Pause toggle
+        if (playPauseBtn) {
+            playPauseBtn.addEventListener('click', function() {
+                if (playlistIsPlaying) {
+                    pausePlaylistSong();
+                } else {
+                    if (playlistCurrentAudioPlayer) {
+                        playlistCurrentAudioPlayer.play();
+                        playlistIsPlaying = true;
+                        this.innerHTML = '<i class="bi bi-pause-fill"></i>';
+                    } else if (playlistSongs.length > 0) {
+                        playPlaylistSong(0);
+                    }
+                }
+            });
+        }
+
+        // Previous song
+        if (prevBtn) {
+            prevBtn.addEventListener('click', function() {
+                let newIndex;
+                if (playlistIsShuffle) {
+                    newIndex = getRandomPlaylistSongIndex();
+                } else {
+                    newIndex = playlistCurrentSongIndex > 0 ? playlistCurrentSongIndex - 1 : playlistSongs.length - 1;
+                }
+                playPlaylistSong(newIndex);
+            });
+        }
+
+        // Next song
+        if (nextBtn) {
+            nextBtn.addEventListener('click', function() {
+                let newIndex;
+                if (playlistIsShuffle) {
+                    newIndex = getRandomPlaylistSongIndex();
+                } else {
+                    newIndex = playlistCurrentSongIndex < playlistSongs.length - 1 ? playlistCurrentSongIndex + 1 : 0;
+                }
+                playPlaylistSong(newIndex);
+            });
+        }
+
+        // Click on progress bar to seek
+        const progressContainer = progressBar ? progressBar.parentElement : null;
+        if (progressContainer) {
+            progressContainer.addEventListener('click', function(e) {
+                if (playlistCurrentAudioPlayer && playlistCurrentAudioPlayer.duration) {
+                    const rect = this.getBoundingClientRect();
+                    const clickX = e.clientX - rect.left;
+                    const percentage = clickX / rect.width;
+                    playlistCurrentAudioPlayer.currentTime = percentage * playlistCurrentAudioPlayer.duration;
+                }
+            });
+        }
+
+        // Volume slider
+        if (volumeSlider) {
+            volumeSlider.addEventListener('input', function() {
+                playlistCurrentVolume = this.value / 100;
+                if (playlistCurrentAudioPlayer) {
+                    playlistCurrentAudioPlayer.volume = playlistCurrentVolume;
+                }
+            });
+        }
+
+        // Ensure initial visual state of repeat button (first time controls are initialized)
+        if (repeatBtn) {
+            repeatBtn.classList.remove('btn-primary');
+            repeatBtn.classList.add('btn-outline-secondary');
+            repeatBtn.innerHTML = '<i class="bi bi-repeat"></i>';
+            repeatBtn.title = 'Repeat';
+        }
+    }
 }
 
 function formatTime(seconds) {
