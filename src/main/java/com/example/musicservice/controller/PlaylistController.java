@@ -1,14 +1,6 @@
 package com.example.musicservice.controller;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +22,6 @@ import com.example.musicservice.dto.PlaylistResponse;
 import com.example.musicservice.service.PlaylistService;
 
 import jakarta.validation.Valid;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
