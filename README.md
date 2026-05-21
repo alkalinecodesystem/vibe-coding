@@ -265,6 +265,11 @@ curl -X POST "http://localhost:8081/api/upload/zip?force=true" \
   -F "file=@/path/to/music.zip"
 ```
 
+**Bulk upload (all *.zip files in current directory):**
+```bash
+for X in *.zip; do  curl -X POST "http://localhost:8081/api/upload/zip" -F "file=@$X"; done
+```
+
 **ZIP File Structure:**
 The ZIP file should contain audio files (MP3, FLAC, OGG, WAV, M4A) organized in any directory structure. The service will:
 1. Extract the ZIP to a persistent directory (configured via `app.upload.extracted-dir`, default: `/tmp/music-extracted`)
