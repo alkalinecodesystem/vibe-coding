@@ -258,8 +258,8 @@ public class ZipUploadService {
 					counters[1], counters[2], counters[3]);
 
 			String message = String.format(
-					"Processed %d audio files. Created: %d artists, %d albums, %d songs. Skipped: %d files",
-					audioFiles.size(), counters[0], counters[1], counters[2], counters[3]);
+					"Processed %d audio files. File: %s Created: %d artists, %d albums, %d songs. Skipped: %d files",
+					audioFiles.size(), file.getOriginalFilename(),  counters[0], counters[1], counters[2], counters[3]);
 
 			return new UploadResponse(true, message, extractionDir.toString());
 

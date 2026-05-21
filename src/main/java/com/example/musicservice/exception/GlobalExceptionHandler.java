@@ -14,6 +14,7 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import com.example.musicservice.dto.ApiResponse;
 
@@ -74,6 +75,13 @@ public class GlobalExceptionHandler {
 		logger.warn("Static resource not found: {}", ex.getResourcePath());
 		return ResponseEntity.status(HttpStatus.NOT_FOUND)
 				.body(ApiResponse.error("Resource not found"));
+	}
+
+	@ExceptionHandler(MaxUploadSizeExceededException.class)
+	public ResponseEntity<ApiResponse<Object>> handleMaxUploadSizeExceeded(MaxUploadSizeExceededException ex) {
+		logger.warn("Maximum upload size exceeded: {}", ex.getMessage());
+		return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
+				.body(ApiResponse.error("File size exceeds the maximum allowed limit (500MB)"));
 	}
 
 	@ExceptionHandler(Exception.class)
