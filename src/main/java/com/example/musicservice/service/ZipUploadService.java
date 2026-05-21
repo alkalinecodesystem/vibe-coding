@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.musicservice.dto.UploadAnalysisResponse;
 import com.example.musicservice.dto.UploadResponse;
 import com.example.musicservice.exception.InvalidFileException;
 import com.example.musicservice.model.Album;
@@ -267,6 +269,87 @@ public class ZipUploadService {
 		} finally {
 			// Files are kept persistently, no cleanup
 			logger.debug("Extracted files remain at: {}", extractionDir);
+		}
+	}
+
+	public UploadAnalysisResponse analyzeZipFile(MultipartFile file) {
+		logger.info("Analyzing ZIP file for existing albums: {}", file.getOriginalFilename());
+
+		validateZipFile(file);
+
+		Path tempDir = null;
+		try {
+			tempDir = Files.createTempDirectory("zip-analyze-");
+			extractZipFile(file.getInputStream(), tempDir);
+
+			Set<String> albumTitles = collectUniqueAlbumTitles(tempDir);
+
+			List<String> existingAlbums = new ArrayList<>();
+			List<String> newAlbums = new ArrayList<>();
+
+			for (String title : albumTitles) {
+				if (albumRepository.findByTitleIgnoreCase(title).isPresent()) {
+					existingAlbums.add(title);
+				} else {
+					newAlbums.add(title);
+				}
+			}
+
+			boolean hasDuplicates = !existingAlbums.isEmpty();
+			String msg = hasDuplicates
+					? "Some albums already exist."
+					: "No duplicate albums found.";
+
+			return UploadAnalysisResponse.builder()
+					.hasExistingAlbums(hasDuplicates)
+					.existingAlbums(existingAlbums)
+					.newAlbums(newAlbums)
+					.totalAlbumsInZip(albumTitles.size())
+					.message(msg)
+					.build();
+
+		} catch (IOException e) {
+			logger.error("Error analyzing ZIP file", e);
+			throw new InvalidFileException("Failed to analyze ZIP file: " + e.getMessage());
+		} finally {
+			if (tempDir != null) {
+				deleteDirectoryRecursively(tempDir);
+			}
+		}
+	}
+
+	private Set<String> collectUniqueAlbumTitles(Path extractionDir) {
+		List<File> audioFiles = findAudioFiles(extractionDir.toFile());
+		Set<String> albums = new HashSet<>();
+
+		for (File audioFile : audioFiles) {
+			try {
+				AudioFile audio = AudioFileIO.read(audioFile);
+				Tag tag = audio.getTag();
+				if (tag != null) {
+					String albumTitle = tag.getFirst(FieldKey.ALBUM);
+					if (albumTitle != null && !albumTitle.trim().isEmpty()) {
+						albums.add(albumTitle.trim());
+					}
+				}
+			} catch (Exception e) {
+				logger.warn("Could not read tags from {} during analysis", audioFile.getName());
+			}
+		}
+		return albums;
+	}
+
+	private void deleteDirectoryRecursively(Path path) {
+		try {
+			if (Files.exists(path)) {
+				Files.walk(path)
+						.sorted(Comparator.reverseOrder())
+						.map(Path::toFile)
+						.forEach(File::delete);
+				logger.debug("Deleted temporary analysis directory: {}", path);
+			}
+		} catch (Exception e) {
+			logger.warn("Failed to clean up temporary directory: {}", path, e);
 		}
 	}
 

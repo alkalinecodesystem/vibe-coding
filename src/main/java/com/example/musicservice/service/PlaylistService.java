@@ -39,7 +39,7 @@ public class PlaylistService {
 	private final PlaylistRepository playlistRepository;
 	private final SongRepository songRepository;
 
-	@Value("${app.playlists.dir:/home/user/playlists}")
+	@Value("${app.playlists.dir:/tmp/playlists}")
 	private String playlistsDir;
 
 	public PlaylistResponse createPlaylist(PlaylistRequest request) {

@@ -157,7 +157,7 @@ curl -X POST http://localhost:8081/api/songs \
     "trackNumber": 1,
     "durationSeconds": 259,
     "genre": "Rock",
-    "filePath": "/home/user/music-extracted/20240429_211739_1234abcd/The Beatles/Abbey Road/01 - Come Together.mp3",
+    "filePath": "/tmp/music-extracted/20240429_211739_1234abcd/The Beatles/Abbey Road/01 - Come Together.mp3",
     "album": {
       "id": 1,
       "title": "Abbey Road",
@@ -199,15 +199,37 @@ curl -X POST http://localhost:8081/api/playlists/1/songs/1
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/api/upload/zip` | Upload ZIP file containing audio files |
+| POST | `/api/upload/zip` | Upload ZIP file containing audio files. Supports `?force=true` for duplicate confirmation. |
 
-**Example - Upload ZIP:**
+#### Duplicate Album Detection & Confirmation Flow
+
+Before processing a ZIP, the service automatically checks whether any album titles inside it already exist in the database (case-insensitive match on title only).
+
+**Query Parameter:**
+
+| Param | Type | Default | Description |
+|-------|------|---------|-------------|
+| `force` | boolean | `false` | When `false`, the endpoint first analyzes the ZIP. If duplicates are found it returns a warning instead of processing. Set to `true` to bypass the check and proceed anyway. |
+
+**Behavior:**
+
+1. **First call** (without `force` or `force=false`):
+   - The server performs a dry-run analysis of all album titles in the ZIP.
+   - If any album already exists → returns **HTTP 409 Conflict** with an `UploadAnalysisResponse` containing:
+     - `existingAlbums`: list of album titles that would be duplicated
+     - `newAlbums`: albums that would be created
+     - `hasExistingAlbums`, `totalAlbumsInZip`, `message`
+
+2. **Call with `?force=true`**:
+   - Processing always occurs. Existing albums are reused; new songs are added to them.
+
+**Example - Normal upload (no duplicates):**
 ```bash
 curl -X POST http://localhost:8081/api/upload/zip \
   -F "file=@/path/to/music.zip"
 ```
 
-**Example response:**
+**Example success response:**
 ```json
 {
   "success": true,
@@ -215,19 +237,41 @@ curl -X POST http://localhost:8081/api/upload/zip \
   "data": {
     "success": true,
     "message": "Processed 10 audio files. Created: 2 artists, 3 albums, 10 songs. Skipped: 0 files",
-    "extractionPath": "/home/user/music-extracted/20240429_211739_1234abcd"
+    "extractionPath": "/tmp/music-extracted/20240429_211739_1234abcd"
   },
   "errors": null
 }
 ```
 
+**Example - Duplicates detected (409 response):**
+```json
+{
+  "success": true,
+  "message": "Some albums already exist. Set force=true for continue.",
+  "data": {
+    "hasExistingAlbums": true,
+    "existingAlbums": ["The Dark Side of the Moon", "Wish You Were Here"],
+    "newAlbums": ["Animals"],
+    "totalAlbumsInZip": 3,
+    "message": "Some albums already exist."
+  },
+  "errors": null
+}
+```
+
+To force the upload despite duplicates:
+```bash
+curl -X POST "http://localhost:8081/api/upload/zip?force=true" \
+  -F "file=@/path/to/music.zip"
+```
+
 **ZIP File Structure:**
 The ZIP file should contain audio files (MP3, FLAC, OGG, WAV, M4A) organized in any directory structure. The service will:
-1. Extract the ZIP to a persistent directory (configured via `app.upload.extracted-dir`, default: `/home/user/music-extracted`)
+1. Extract the ZIP to a persistent directory (configured via `app.upload.extracted-dir`, default: `/tmp/music-extracted`)
 2. Scan for supported audio files recursively
 3. Read ID3/metadata tags from each file
 4. **Store the absolute file path** of each audio file in the `songs.filePath` field
-5. Create artists, albums, and songs in the database
+5. Create artists, albums, and songs in the database (reusing existing albums when `force=true`)
 6. Return a summary of processed files including the extraction path
 
 **Configuration:**
@@ -236,10 +280,10 @@ The ZIP file should contain audio files (MP3, FLAC, OGG, WAV, M4A) organized in 
 spring.servlet.multipart.max-file-size=500MB
 spring.servlet.multipart.max-request-size=500MB
 
-# Extracted files storage directory (default: /home/user/music-extracted)
+# Extracted files storage directory (default: /tmp/music-extracted)
 app.upload.extracted-dir=/path/to/your/extracted-files
 
-# Playlists storage directory (default: /home/user/playlists)
+# Playlists storage directory (default: /tmp/playlists)
 app.playlists.dir=/path/to/your/playlists
 ```
 
@@ -254,7 +298,7 @@ Optional tags:
 - `GENRE` (genre)
 - Duration is read from audio header
 
-**Note:** Duplicate artists (by name) and albums (by title + artist) are automatically detected and reused.
+**Note:** Duplicate artists (by name) are automatically detected and reused. Albums are matched by title only (case-insensitive). When duplicates are detected, the API returns a 409 warning so the client can ask the user for confirmation before proceeding with `?force=true`.
 
 ## Web Interface
 

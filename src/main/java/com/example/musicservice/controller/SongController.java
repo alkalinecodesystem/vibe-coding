@@ -102,7 +102,7 @@ public class SongController {
 
 			// Security: Ensure the path is within the allowed directory
 			// We'll check if it starts with the configured extracted directory
-			String baseDir = System.getProperty("app.upload.extracted-dir", "/home/user/music-extracted");
+			String baseDir = System.getProperty("app.upload.extracted-dir", "/tmp/music-extracted");
 			Path filePath = Paths.get(decodedPath);
 
 			// Optional: Add additional security checks to prevent directory traversal
