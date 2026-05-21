@@ -43,11 +43,11 @@ public class ThymeleafController {
 
 		long coversCount = allAlbums.stream().filter(AlbumViewDTO::isHasCover).count();
 
-		// Get random 10 albums for main page
+		// Get random 12 albums for main page
 		List<AlbumViewDTO> randomAlbums = allAlbums.stream()
 				.collect(Collectors.collectingAndThen(Collectors.toList(), list -> {
 					Collections.shuffle(list);
-					return list.stream().limit(10).toList();
+					return list.stream().limit(12).toList();
 				}));
 
 		long artistCount = allAlbums.stream().map(AlbumViewDTO::getArtistName).distinct().count();

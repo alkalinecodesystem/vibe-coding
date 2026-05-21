@@ -39,8 +39,8 @@ public class SongController {
 
 	private final SongService songService;
 
-	@Value("${app.upload.extracted-dir}")
-	private String extractedDir; // ❗ not final
+	@Value("${app.upload.extracted-dir:/tmp/music-extracted}")
+	private String extractedDir;
 
 	@PostMapping
 	public ResponseEntity<ApiResponse<SongResponse>> createSong(@Valid @RequestBody SongRequest request) {
@@ -102,7 +102,7 @@ public class SongController {
 
 			// Security: Ensure the path is within the allowed directory
 			// We'll check if it starts with the configured extracted directory
-			String baseDir = System.getProperty("app.upload.extracted-dir", "/tmp/music-extracted");
+			String baseDir = this.extractedDir;
 			Path filePath = Paths.get(decodedPath);
 
 			// Optional: Add additional security checks to prevent directory traversal
