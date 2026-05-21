@@ -267,7 +267,7 @@ curl -X POST "http://localhost:8081/api/upload/zip?force=true" \
 
 **Bulk upload (all *.zip files in current directory):**
 ```bash
-for X in *.zip; do  curl -X POST "http://localhost:8081/api/upload/zip" -F "file=@$X"; done
+for X in *.zip; do  curl -X POST "http://localhost:8081/api/upload/zip" -F "file=@$X"; echo; done
 ```
 
 **ZIP File Structure:**
