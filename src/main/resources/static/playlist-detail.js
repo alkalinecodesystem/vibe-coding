@@ -441,6 +441,14 @@ function setupPlaylistPlayerControls() {
             row.classList.toggle('table-active', idx === songIndex);
         });
 
+        const activeRow = rows[songIndex];
+        if (activeRow) {
+            const container = document.getElementById('playlist-modal-song-list');
+            if (container) {
+                activeRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
         // Set up event listeners
         playlistCurrentAudioPlayer.addEventListener('loadedmetadata', function() {
             totalTimeEl.textContent = formatTime(this.duration);

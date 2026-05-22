@@ -219,6 +219,14 @@ function initAlbums() {
       const rows = document.querySelectorAll('#modal-song-list tbody tr');
       rows.forEach((r, idx) => r.classList.toggle('table-active', idx === songIndex));
 
+      const activeRow = rows[songIndex];
+      if (activeRow) {
+        const container = document.getElementById('modal-song-list');
+        if (container) {
+          activeRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+
       currentAudioPlayer.addEventListener('loadedmetadata', function () {
         totalTimeEl.textContent = formatTime(this.duration);
       });
