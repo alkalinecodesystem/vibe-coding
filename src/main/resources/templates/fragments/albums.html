@@ -198,6 +198,9 @@
  				if (artistModal) artistModal.addEventListener('show.bs.modal', reinitScripts);
  			});
  		})();
+		document.getElementById('albumModal').addEventListener('shown.bs.modal', () => {
+           document.getElementById('modal-song-list').scrollTop = 0;
+        });
  	</script>
  </div>
 

@@ -299,5 +299,8 @@
  				});
  			});
  		})();
+	    document.getElementById('playPlaylistModal').addEventListener('shown.bs.modal', () => {
+           document.getElementById('playlist-modal-song-list').scrollTop = 0;
+        });
  	</script>
  </div>
