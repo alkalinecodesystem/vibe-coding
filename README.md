@@ -340,6 +340,34 @@ app.upload.extracted-dir=/path/to/your/extracted-files
 app.playlists.dir=/path/to/your/playlists
 ```
 
+**Backup of extracted directories (music-extracted):**
+
+The service extracts uploads into a nested structure:
+
+```
+/tmp/music-extracted/<timestamp>/
+    <Album>/
+      01 - Track.mp3
+      02 - Track.mp3
+      cover.jpg
+      <scans>
+```
+
+To create per-album ZIP backups **omitting the first directory (timestamp)**, run this from inside the music-extracted folder:
+
+```bash
+for dir in */*/; do
+  zipname="${dir#*/}"
+  zipname="${zipname%/}.zip"
+  parent="${dir%%/*}"
+  subdir="${dir#*/}"
+  subdir="${subdir%/}"
+  (cd "$parent" && zip -r "../$zipname" "$subdir")
+done
+```
+
+Result: `Album.zip` (containing `Album/...` but without the timestamp path).
+
 **Required Tags:**
 - `ARTIST` (artist name)
 - `ALBUM` (album title)
