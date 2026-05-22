@@ -26,6 +26,7 @@ A Spring Boot REST API for managing artists, albums, songs, and playlists with Z
 - JSON API responses (mobile-first)
 - Pagination for albums with covers and songs
 - Comprehensive logging with SLF4J
+- **ZIP Export** - Download albums or playlists as ZIP (includes all audio files + generated M3U playlist)
 
 ## Getting Started
 
@@ -37,8 +38,9 @@ A Spring Boot REST API for managing artists, albums, songs, and playlists with Z
 
 ### Running the Application
 
+From the project root (directory containing `pom.xml`):
+
 ```bash
-cd music-service
 mvn spring-boot:run
 ```
 
@@ -142,6 +144,7 @@ curl -X POST http://localhost:8081/api/artists \
 | POST | `/api/albums/{id}/cover` | Upload/update album cover image |
 | GET | `/api/albums/{id}/cover` | Download album cover image |
 | DELETE | `/api/albums/{id}/cover` | Delete album cover image |
+| GET | `/api/albums/{id}/download` | Download entire album as ZIP (audio files + M3U playlist) |
 
 **Example - Create Album:**
 ```bash
@@ -226,6 +229,7 @@ curl -X POST http://localhost:8081/api/songs \
 | POST | `/api/playlists/{playlistId}/songs/{songId}` | Add song to playlist |
 | DELETE | `/api/playlists/{playlistId}/songs/{songId}` | Remove song from playlist |
 | POST | `/api/playlists/{id}/save` | Save playlist to file |
+| GET | `/api/playlists/{id}/download` | Download playlist as ZIP (audio files + M3U playlist) |
 
 **Example - Create Playlist:**
 ```bash
@@ -490,6 +494,7 @@ CREATE TABLE songs (
   duration_seconds INTEGER,
   genre VARCHAR(50),
   file_path VARCHAR(500),
+  original_artist VARCHAR(100),
   album_id BIGINT NOT NULL,
   FOREIGN KEY (album_id) REFERENCES albums(id)
 );
@@ -534,26 +539,30 @@ java -jar target/music-service-1.0.0.jar
 
 ```
 music-service/
+├── pom.xml
 ├── src/main/java/com/example/musicservice/
 │   ├── MusicServiceApplication.java    # Main application class
 │   ├── controller/                     # REST controllers
-│   │   ├── ArtistController.java
 │   │   ├── AlbumController.java
+│   │   ├── AlbumZipController.java     # ZIP download for albums + M3U
+│   │   ├── ArtistController.java
 │   │   ├── PlaylistController.java
+│   │   ├── PlaylistZipController.java  # ZIP download for playlists + M3U
 │   │   ├── SongController.java
-│   │   ├── ThymeleafController.java     # MVC controller for Thymeleaf pages
+│   │   ├── ThymeleafController.java    # MVC controller for Thymeleaf pages
 │   │   └── UploadController.java
 │   ├── dto/                            # Data transfer objects
 │   │   ├── ApiResponse.java
-│   │   ├── ArtistRequest.java
-│   │   ├── ArtistResponse.java
 │   │   ├── AlbumRequest.java
 │   │   ├── AlbumResponse.java
+│   │   ├── ArtistRequest.java
+│   │   ├── ArtistResponse.java
 │   │   ├── PaginatedResponse.java
 │   │   ├── PlaylistRequest.java
 │   │   ├── PlaylistResponse.java
 │   │   ├── SongRequest.java
 │   │   ├── SongResponse.java
+│   │   ├── UploadAnalysisResponse.java
 │   │   ├── UploadResponse.java
 │   │   ├── web/
 │   │   │   ├── AlbumViewDTO.java
@@ -582,7 +591,16 @@ music-service/
 ├── src/main/resources/
 │   ├── application.properties
 │   ├── static/
-│   │   └── favicon.ico
+│   │   ├── album-detail.js
+│   │   ├── albums.js
+│   │   ├── artist.js
+│   │   ├── favicon.ico
+│   │   ├── playlist-detail.js
+│   │   ├── playlists.js
+│   │   ├── songs.js
+│   │   ├── styles.css
+│   │   ├── theme.js
+│   │   └── upload.js
 │   └── templates/
 │       ├── layout.html
 │       ├── fragments/
@@ -594,7 +612,8 @@ music-service/
 │       │   ├── playlists.html
 │       │   ├── songs.html
 │       │   └── upload.html
-└── pom.xml
+├── README.md
+└── .gitignore
 ```
 
 ## Future Improvements
