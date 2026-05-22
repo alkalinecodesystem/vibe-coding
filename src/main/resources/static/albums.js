@@ -64,7 +64,7 @@ function initAlbums() {
       });
     }
   }
-
+  
   const playAlbumButtons = document.querySelectorAll('.play-album-btn');
   playAlbumButtons.forEach(button => {
     if (button.dataset.playAlbumListenerAttached === 'true') return;
@@ -79,6 +79,14 @@ function initAlbums() {
         return;
       }
 
+      // Set header info and reset cover container immediately (before fetch) so modal shows fresh content, no stale previous album
+      document.getElementById('modal-album-title').textContent = albumTitle || '';
+      document.getElementById('modal-album-artist').textContent = albumArtist || '';
+      const coverContainer = document.getElementById('modal-album-cover');
+      if (coverContainer) {
+        coverContainer.innerHTML = '';
+      }
+
       try {
         const response = await fetch(`/api/albums/${albumId}`);
         if (!response.ok) {
@@ -87,15 +95,16 @@ function initAlbums() {
         const responseJson = await response.json();
         const data = responseJson.data;
 
-        document.getElementById('modal-album-title').textContent = albumTitle;
-        document.getElementById('modal-album-artist').textContent = albumArtist;
-
-        const coverImg = document.getElementById('modal-album-cover');
         if (data.hasCover && data.coverContentType && data.coverImageBase64) {
-          coverImg.src = 'data:' + data.coverContentType + ';base64,' + data.coverImageBase64;
-          coverImg.style.display = 'center';
+          const img = document.createElement('img');
+          img.src = 'data:' + data.coverContentType + ';base64,' + data.coverImageBase64;
+          img.alt = 'Album Cover';
+          img.className = 'img-fluid rounded modal-album-cover';
+          coverContainer.appendChild(img);
         } else {
-          coverImg.style.display = 'none';
+          const icon = document.createElement('i');
+          icon.className = 'bi bi-music-note-beamed fs-1 text-primary';
+          coverContainer.appendChild(icon);
         }
 
         currentAlbumSongs = data.songs || [];
@@ -165,6 +174,10 @@ function initAlbums() {
             repeatMode = 'none';
             const btn = currentTriggerButton;
           if (btn && document.body.contains(btn)) btn.focus();
+          const coverContainer = document.getElementById('modal-album-cover');
+          if (coverContainer) {
+            coverContainer.innerHTML = '';
+          }
         }, { once: true });
 
       } catch (err) {
