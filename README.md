@@ -7,7 +7,7 @@ A Spring Boot REST API for managing artists, albums, songs, and playlists with Z
 - **Spring Boot** 3.2.0
 - **Java 17**
 - **JPA/Hibernate** for ORM
-- **H2 Database** (in-memory)
+- **H2 Database** (in-memory, default for dev) or **PostgreSQL** (for production)
 - **Lombok** for boilerplate reduction
 - **JAudiotagger** for reading audio file metadata
 - **Maven** for dependency management
@@ -33,6 +33,7 @@ A Spring Boot REST API for managing artists, albums, songs, and playlists with Z
 
 - Java 17+
 - Maven 3.8+
+- Docker (optional, for running PostgreSQL)
 
 ### Running the Application
 
@@ -51,6 +52,49 @@ Access Points:
 - JDBC URL: `jdbc:h2:mem:musicdb`
 - Username: `sa`
 - Password: (empty)
+
+### Database Configuration
+
+By default, the service uses the embedded **H2** in-memory database (perfect for development). The console is at `/h2-console` with the credentials above.
+
+#### Connecting to PostgreSQL
+
+For persistent storage or production use:
+
+1. **Add the PostgreSQL driver** to `pom.xml` (alongside the H2 dependency):
+
+   ```xml
+   <dependency>
+   	<groupId>org.postgresql</groupId>
+   	<artifactId>postgresql</artifactId>
+   	<scope>runtime</scope>
+   </dependency>
+   ```
+
+2. **Configure connection** – either edit `application.properties`
+
+   ```properties
+   # PostgreSQL datasource
+   spring.datasource.url=jdbc:postgresql://localhost:5432/musicdb
+   spring.datasource.driver-class-name=org.postgresql.Driver
+   spring.datasource.username=musicuser
+   spring.datasource.password=secret
+
+   # Hibernate settings for Postgres
+   spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
+   spring.jpa.hibernate.ddl-auto=update
+   spring.jpa.show-sql=false
+   ```
+
+**One-liner Postgres via Docker:**
+
+```bash
+docker run -d --name music-postgres \
+  -e POSTGRES_DB=musicdb -e POSTGRES_USER=musicuser -e POSTGRES_PASSWORD=secret \
+  -p 5432:5432 postgres:16-alpine
+```
+
+Update the JDBC URL if your Postgres runs on a different host/port. Hibernate will auto-create the tables (see "Database Schema" below).
 
 ## API Endpoints
 
@@ -560,7 +604,7 @@ music-service/
 - Add file validation (actual MIME type checking)
 - Add rate limiting for uploads
 - Add integration tests
-- Support for external databases (PostgreSQL, MySQL)
+- Support for MySQL (PostgreSQL support documented above)
 - Add caching (Redis)
 - Add Swagger/OpenAPI documentation
 - Add support for streaming large files
