@@ -182,6 +182,7 @@ function initAlbums() {
     const shuffleBtn = document.getElementById('shuffle-btn');
     const repeatBtn = document.getElementById('repeat-btn');
     const progressBar = document.getElementById('progress-bar');
+    progressBar.style.width=0;
     const currentTimeEl = document.getElementById('current-time');
     const totalTimeEl = document.getElementById('total-time');
     const currentSongTitleEl = document.getElementById('current-song-title');

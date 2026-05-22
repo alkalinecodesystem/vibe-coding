@@ -384,6 +384,7 @@ function setupPlaylistPlayerControls() {
     const shuffleBtn = document.getElementById('playlist-shuffle-btn');
     const repeatBtn = document.getElementById('playlist-repeat-btn');
     const progressBar = document.getElementById('playlist-progress-bar');
+    progressBar.style.width=0;
     const currentTimeEl = document.getElementById('playlist-current-time');
     const totalTimeEl = document.getElementById('playlist-total-time');
     const playlistCurrentSongTitleEl = document.getElementById('playlist-current-song-title');
