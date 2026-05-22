@@ -386,8 +386,11 @@ function setupPlaylistPlayerControls() {
     const progressBar = document.getElementById('playlist-progress-bar');
     progressBar.style.width=0;
     const currentTimeEl = document.getElementById('playlist-current-time');
+    currentTimeEl.textContent='🕱';
     const totalTimeEl = document.getElementById('playlist-total-time');
+    totalTimeEl.textContent='🕱';
     const playlistCurrentSongTitleEl = document.getElementById('playlist-current-song-title');
+    playlistCurrentSongTitleEl.textContent='🕱';
     const volumeSlider = document.getElementById('playlist-volume-slider');
 
     function getRandomPlaylistSongIndex() {
