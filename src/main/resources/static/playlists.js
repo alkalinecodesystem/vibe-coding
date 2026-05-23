@@ -1,5 +1,6 @@
 // Playlists page JavaScript
 let currentSavePlaylistId = null;
+let currentDeletePlaylistId = null;
 
 document.addEventListener('DOMContentLoaded', function() {
     const createPlaylistForm = document.getElementById('createPlaylistForm');
@@ -51,6 +52,19 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('save-playlist-name').textContent = playlistName;
         });
     }
+
+    // Handle delete playlist modal
+    const deletePlaylistModal = document.getElementById('deletePlaylistModal');
+    if (deletePlaylistModal) {
+        deletePlaylistModal.addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            const playlistId = button.getAttribute('data-playlist-id');
+            const playlistName = button.getAttribute('data-playlist-name');
+
+            currentDeletePlaylistId = playlistId;
+            document.getElementById('delete-playlist-name').textContent = playlistName;
+        });
+    }
 });
 
 function confirmSavePlaylist() {
@@ -83,6 +97,36 @@ function confirmSavePlaylist() {
             alert('Error saving playlist');
             confirmBtn.disabled = false;
             confirmBtn.innerHTML = '<i class="bi bi-download"></i> Save Playlist';
+        });
+}
+
+function confirmDeletePlaylist() {
+    if (!currentDeletePlaylistId) return;
+
+    const confirmBtn = document.getElementById('confirmDeletePlaylistBtn');
+    confirmBtn.disabled = true;
+    confirmBtn.innerHTML = '<i class="bi bi-hourglass"></i> Deleting...';
+
+    fetch(`/api/playlists/${currentDeletePlaylistId}`, {
+        method: 'DELETE'
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('deletePlaylistModal'));
+                modal.hide();
+                location.reload();
+            } else {
+                alert('Error deleting playlist: ' + (data.message || 'Unknown error'));
+                confirmBtn.disabled = false;
+                confirmBtn.innerHTML = '<i class="bi bi-trash"></i> Delete Playlist';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error deleting playlist');
+            confirmBtn.disabled = false;
+            confirmBtn.innerHTML = '<i class="bi bi-trash"></i> Delete Playlist';
         });
 }
 

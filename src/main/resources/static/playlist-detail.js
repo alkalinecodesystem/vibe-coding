@@ -85,6 +85,18 @@ function initPlaylistDetail() {
             playlistRepeatMode = 'none';
         });
     }
+
+    // Setup delete playlist modal (attach only once)
+    const deletePlaylistModal = document.getElementById('deletePlaylistModal');
+    if (deletePlaylistModal && !deletePlaylistModal.dataset.playlistModalListeners) {
+        deletePlaylistModal.dataset.playlistModalListeners = 'true';
+        deletePlaylistModal.addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            const playlistName = button.getAttribute('data-playlist-name');
+            const nameEl = document.getElementById('delete-playlist-name');
+            if (nameEl) nameEl.textContent = playlistName || '';
+        });
+    }
 }
 
 initPlaylistDetail();
@@ -889,4 +901,32 @@ function renderPagination() {
         }
     });
     ul.appendChild(lastLi);
+}
+
+function confirmDeletePlaylist() {
+    if (!currentPlaylistId) return;
+
+    const confirmBtn = document.getElementById('confirmDeletePlaylistBtn');
+    confirmBtn.disabled = true;
+    confirmBtn.innerHTML = '<i class="bi bi-hourglass"></i> Deleting...';
+
+    fetch(`/api/playlists/${currentPlaylistId}`, {
+        method: 'DELETE'
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = '/playlists';
+            } else {
+                alert('Error deleting playlist: ' + (data.message || 'Unknown error'));
+                confirmBtn.disabled = false;
+                confirmBtn.innerHTML = '<i class="bi bi-trash"></i> Delete Playlist';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error deleting playlist');
+            confirmBtn.disabled = false;
+            confirmBtn.innerHTML = '<i class="bi bi-trash"></i> Delete Playlist';
+        });
 }
