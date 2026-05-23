@@ -197,9 +197,9 @@ function initAlbums() {
     const progressBar = document.getElementById('progress-bar');
     progressBar.style.width=0;
     const currentTimeEl = document.getElementById('current-time');
-    currentTimeEl.textContent='🕱';
+    currentTimeEl.textContent='--:--';
     const totalTimeEl = document.getElementById('total-time');
-    totalTimeEl.textContent='🕱';
+    totalTimeEl.textContent='--:--';
     const currentSongTitleEl = document.getElementById('current-song-title');
     currentSongTitleEl.textContent='🕱';
     const volumeSlider = document.getElementById('volume-slider');

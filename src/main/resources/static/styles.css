@@ -411,14 +411,6 @@ body {
 	box-shadow: 0 2px 8px var(--shadow);
 }
 
-.album-cover-large {
-	width: 200px;
-	height: 200px;
-	object-fit: cover;
-	border-radius: 8px;
-	box-shadow: 0 4px 16px var(--shadow);
-}
-
 .nav-pills .nav-link.active {
 	background-color: var(--primary-color);
 }
