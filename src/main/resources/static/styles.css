@@ -15,20 +15,20 @@
 	--navbar-text: #ffffff;
 }
 
-/* Dracula Theme */
+/* Dracula Theme (Darker) */
 .theme-dracula {
-	--bg-color: #282a36;
+	--bg-color: #1a1b26;
 	--text-color: #f8f8f2;
-	--sidebar-bg: linear-gradient(180deg, #44475a 0%, #6272a4 100%);
-	--sidebar-text: #6272a4;
-	--sidebar-hover: rgba(255, 255, 255, 0.1);
-	--card-bg: #44475a;
-	--border-color: #6272a4;
+	--sidebar-bg: linear-gradient(180deg, #1f202e 0%, #2a2c3a 100%);
+	--sidebar-text: #5a5d70;
+	--sidebar-hover: rgba(255, 255, 255, 0.08);
+	--card-bg: #232536;
+	--border-color: #2f3140;
 	--primary-color: #bd93f9;
-	--secondary-bg: #3c3f4a;
-	--muted-text: #6272a4;
-	--shadow: rgba(0, 0, 0, 0.3);
-	--navbar-bg: #21222c;
+	--secondary-bg: #1f202e;
+	--muted-text: #5a5d70;
+	--shadow: rgba(0, 0, 0, 0.5);
+	--navbar-bg: #14151f;
 	--navbar-text: #f8f8f2;
 }
 
@@ -53,41 +53,41 @@
 
 /* Dracula Theme - Dark Table Styles */
 .theme-dracula .table {
-	background-color: #282a36;
+	background-color: #1a1b26;
 	color: #f8f8f2;
-	border-color: #44475a;
+	border-color: #232536;
 }
 
 .theme-dracula .table thead th {
-	background-color: #44475a;
-	border-bottom-color: #6272a4;
+	background-color: #232536;
+	border-bottom-color: #2f3140;
 	color: #f8f8f2;
 }
 
 .theme-dracula .table td,
 .theme-dracula .table th {
-	border-top-color: #44475a;
+	border-top-color: #232536;
 }
 
 .theme-dracula .table-hover tbody tr:hover {
-	background-color: #44475a;
+	background-color: #232536;
 }
 
 .theme-dracula .table-light {
-	background-color: #44475a !important;
+	background-color: #232536 !important;
 	color: #f8f8f2 !important;
 }
 
 /* Dracula Theme - Modal Styles */
 .theme-dracula .modal-content {
-	background-color: #282a36;
+	background-color: #1a1b26;
 	color: #f8f8f2;
-	border-color: #44475a;
+	border-color: #232536;
 }
 
 .theme-dracula .modal-header {
-	background-color: #44475a;
-	border-bottom-color: #6272a4;
+	background-color: #232536;
+	border-bottom-color: #2f3140;
 }
 
 .theme-dracula .modal-title {
@@ -95,13 +95,13 @@
 }
 
 .theme-dracula .modal-body {
-	background-color: #282a36;
+	background-color: #1a1b26;
 	color: #f8f8f2;
 }
 
 .theme-dracula .modal-footer {
-	background-color: #44475a;
-	border-top-color: #6272a4;
+	background-color: #232536;
+	border-top-color: #2f3140;
 }
 
 .theme-dracula .btn-close {
@@ -110,7 +110,7 @@
 
 /* Dracula Theme - Badge Styles */
 .theme-dracula .badge {
-	background-color: #6272a4 !important;
+	background-color: #5a5d70 !important;
 	color: #f8f8f2 !important;
 }
 
@@ -119,7 +119,7 @@
 }
 
 .theme-dracula .badge.bg-secondary {
-	background-color: #6272a4 !important;
+	background-color: #5a5d70 !important;
 }
 
 .theme-dracula .badge.bg-success {
@@ -132,12 +132,12 @@
 
 /* Dracula Theme - Table Content Styles */
 .theme-dracula .table .btn {
-	border-color: #6272a4;
+	border-color: #5a5d70;
 	color: #f8f8f2;
 }
 
 .theme-dracula .table .btn:hover {
-	background-color: #44475a;
+	background-color: #232536;
 	border-color: #bd93f9;
 }
 
@@ -148,16 +148,16 @@
 
 .theme-dracula .table .btn-outline-primary:hover {
 	background-color: #bd93f9;
-	color: #282a36;
+	color: #1a1b26;
 }
 
 .theme-dracula .table .btn-outline-secondary {
-	color: #6272a4;
-	border-color: #6272a4;
+	color: #5a5d70;
+	border-color: #5a5d70;
 }
 
 .theme-dracula .table .btn-outline-secondary:hover {
-	background-color: #6272a4;
+	background-color: #5a5d70;
 	color: #f8f8f2;
 }
 
@@ -168,7 +168,7 @@
 
 .theme-dracula .table .btn-outline-success:hover {
 	background-color: #50fa7b;
-	color: #282a36;
+	color: #1a1b26;
 }
 
 .theme-dracula .table .btn-outline-danger {
