@@ -24,7 +24,7 @@
 	--sidebar-hover: rgba(255, 255, 255, 0.08);
 	--card-bg: #232536;
 	--border-color: #2f3140;
-	--primary-color: #bd93f9;
+	--primary-color: #6e14ec;
 	--secondary-bg: #1f202e;
 	--muted-text: #5a5d70;
 	--shadow: rgba(0, 0, 0, 0.5);
@@ -115,7 +115,7 @@
 }
 
 .theme-dracula .badge.bg-primary {
-	background-color: #bd93f9 !important;
+	background-color: #6e14ec !important;
 }
 
 .theme-dracula .badge.bg-secondary {
@@ -138,16 +138,16 @@
 
 .theme-dracula .table .btn:hover {
 	background-color: #232536;
-	border-color: #bd93f9;
+	border-color: #6e14ec;
 }
 
 .theme-dracula .table .btn-outline-primary {
-	color: #bd93f9;
-	border-color: #bd93f9;
+	color: #6e14ec;
+	border-color: #6e14ec;
 }
 
 .theme-dracula .table .btn-outline-primary:hover {
-	background-color: #bd93f9;
+	background-color: #6e14ec;
 	color: #1a1b26;
 }
 
