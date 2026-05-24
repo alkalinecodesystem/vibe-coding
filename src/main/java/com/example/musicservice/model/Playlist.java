@@ -13,7 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OrderBy;
+import jakarta.persistence.OrderColumn;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -50,7 +50,7 @@ public class Playlist {
 
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "playlist_songs", joinColumns = @JoinColumn(name = "playlist_id"), inverseJoinColumns = @JoinColumn(name = "song_id"))
-	@OrderBy("trackNumber ASC, title ASC")
+	@OrderColumn(name = "song_order")
 	private List<Song> songs = new ArrayList<>();
 
 	@PrePersist
