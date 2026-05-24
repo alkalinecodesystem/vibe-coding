@@ -366,8 +366,16 @@ body {
 }
 
 .btn-primary {
-	background-color: var(--primary-color);
-	border-color: var(--primary-color);
+	background-color: var(--primary-color) !important;
+	border-color: var(--primary-color) !important;
+}
+
+.btn-primary:hover,
+.btn-primary:active,
+.btn-primary:focus,
+.btn-primary.active {
+	background-color: var(--primary-color) !important;
+	border-color: var(--primary-color) !important;
 }
 
 .btn-outline-primary {
@@ -375,9 +383,35 @@ body {
 	border-color: var(--primary-color);
 }
 
-.btn-outline-primary:hover {
+.btn-outline-primary:hover,
+.btn-outline-primary:active,
+.btn-outline-primary:focus,
+.btn-outline-primary.active {
+	background-color: var(--primary-color) !important;
+	border-color: var(--primary-color) !important;
+	color: #fff !important;
+}
+
+/* Pagination - theme active page and links with primary color */
+.pagination .page-link {
+	color: var(--primary-color);
+}
+
+.pagination .page-link:hover,
+.pagination .page-link:focus {
 	background-color: var(--primary-color);
 	border-color: var(--primary-color);
+	color: #fff;
+}
+
+.pagination .page-item.active .page-link {
+	background-color: var(--primary-color) !important;
+	border-color: var(--primary-color) !important;
+	color: #fff;
+}
+
+.text-primary {
+	color: var(--primary-color) !important;
 }
 
 .text-muted {
@@ -463,6 +497,23 @@ body {
 
 .audio-progress {
 	height: 6px;
+}
+
+.progress-bar {
+	background-color: var(--primary-color) !important;
+}
+
+/* Volume sliders - use theme primary color for thumb and track */
+.form-range {
+	accent-color: var(--primary-color);
+}
+
+.form-range::-webkit-slider-thumb {
+	background-color: var(--primary-color) !important;
+}
+
+.form-range::-moz-range-thumb {
+	background-color: var(--primary-color) !important;
 }
 
 /* Select width */
