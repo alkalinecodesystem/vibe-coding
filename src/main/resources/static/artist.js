@@ -6,6 +6,7 @@ function initArtist() {
 		if (button.dataset.artistListenerAttached === 'true') return;
 		button.dataset.artistListenerAttached = 'true';
 		button.addEventListener('click', async function (event) {
+			this.blur(); // immediately remove focus so it doesn't stay colored
 			currentArtistTriggerButton = this;
 
 			const artistId = this.getAttribute('data-artist-id');
@@ -125,11 +126,6 @@ function initArtist() {
 					if (modalInstance) {
 						modalInstance.dispose();
 					}
-					setTimeout(() => {
-						if (currentArtistTriggerButton && document.body.contains(currentArtistTriggerButton)) {
-							currentArtistTriggerButton.focus();
-						}
-					}, 100);
 				});
 
 			} catch (err) {
@@ -140,6 +136,25 @@ function initArtist() {
 			}
 		});
 	});
+
+	// Extra safety: blur any View Artist buttons on click + after the artist modal closes
+	document.querySelectorAll('.view-artist-btn').forEach(btn => {
+		if (btn.dataset.blurListenerAttached === 'true') return;
+		btn.dataset.blurListenerAttached = 'true';
+		btn.addEventListener('click', () => {
+			requestAnimationFrame(() => btn.blur());
+		});
+	});
+
+	const artistModalEl2 = document.getElementById('artistModal');
+	if (artistModalEl2) {
+		artistModalEl2.addEventListener('hidden.bs.modal', () => {
+			const el = document.activeElement;
+			if (el && el.classList.contains('btn-outline-primary') && !el.closest('.modal')) {
+				el.blur();
+			}
+		});
+	}
 }
 
 initArtist();

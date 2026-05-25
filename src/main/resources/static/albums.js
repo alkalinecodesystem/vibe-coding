@@ -70,6 +70,7 @@ function initAlbums() {
     if (button.dataset.playAlbumListenerAttached === 'true') return;
     button.dataset.playAlbumListenerAttached = 'true';
     button.addEventListener('click', async function () {
+      this.blur(); // immediately remove focus so button doesn't stay in "pressed" color
       currentTriggerButton = this;
       const albumId = this.getAttribute('data-album-id');
       const albumTitle = this.getAttribute('data-album-title');
@@ -172,8 +173,6 @@ function initAlbums() {
             isPlaying = false;
             currentSongIndex = -1;
             repeatMode = 'none';
-            const btn = currentTriggerButton;
-          if (btn && document.body.contains(btn)) btn.focus();
           const coverContainer = document.getElementById('modal-album-cover');
           if (coverContainer) {
             coverContainer.innerHTML = '';
@@ -187,6 +186,29 @@ function initAlbums() {
       }
     });
   });
+
+  // Aggressively remove "pressed" color from action buttons (View Artist, Play Album, Download ZIP, View Details)
+  // after they are clicked. This runs on every init (including re-inits from modal show).
+  document.querySelectorAll('.btn-outline-primary').forEach(btn => {
+    if (btn.dataset.blurListenerAttached === 'true') return;
+    btn.dataset.blurListenerAttached = 'true';
+    btn.addEventListener('click', () => {
+      requestAnimationFrame(() => btn.blur());
+    });
+  });
+
+  // After any of our modals close, Bootstrap auto-returns focus to the trigger button.
+  // We remove focus here so the button never stays in the filled "active" color.
+  const albumModalEl2 = document.getElementById('albumModal');
+  const artistModalEl2 = document.getElementById('artistModal');
+  const defocusAlbumActionButtons = () => {
+    const el = document.activeElement;
+    if (el && el.classList.contains('btn-outline-primary') && !el.closest('.modal')) {
+      el.blur();
+    }
+  };
+  if (albumModalEl2) albumModalEl2.addEventListener('hidden.bs.modal', defocusAlbumActionButtons);
+  if (artistModalEl2) artistModalEl2.addEventListener('hidden.bs.modal', defocusAlbumActionButtons);
 
   function setupPlayerControls() {
     const playPauseBtn = document.getElementById('play-pause-btn');

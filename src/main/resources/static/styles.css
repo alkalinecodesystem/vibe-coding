@@ -147,8 +147,16 @@
 }
 
 .theme-dracula .table .btn-outline-primary:hover {
-	background-color: #6e14ec;
-	color: #1a1b26;
+  background-color: #6e14ec;
+  color: #1a1b26;
+}
+
+.theme-dracula .table .btn-outline-primary:focus {
+  color: #6e14ec;
+  border-color: #6e14ec;
+  background-color: transparent;
+  box-shadow: 0 0 0 0.25rem rgba(110, 20, 236, 0.3);
+  outline: none;
 }
 
 .theme-dracula .table .btn-outline-secondary {
@@ -281,8 +289,16 @@
 }
 
 .theme-solarized .table .btn-outline-primary:hover {
-	background-color: #b58900;
-	color: #002b36;
+  background-color: #b58900;
+  color: #002b36;
+}
+
+.theme-solarized .table .btn-outline-primary:focus {
+  color: #b58900;
+  border-color: #b58900;
+  background-color: transparent;
+  box-shadow: 0 0 0 0.25rem rgba(181, 137, 0, 0.3);
+  outline: none;
 }
 
 .theme-solarized .table .btn-outline-secondary {
@@ -385,11 +401,20 @@ body {
 
 .btn-outline-primary:hover,
 .btn-outline-primary:active,
-.btn-outline-primary:focus,
 .btn-outline-primary.active {
-	background-color: var(--primary-color) !important;
-	border-color: var(--primary-color) !important;
-	color: #fff !important;
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+  color: #fff !important;
+}
+
+/* Focus only gets a visible ring (for keyboard users), but does NOT fill the button.
+   This prevents the "stuck pressed color" after clicking action buttons. */
+.btn-outline-primary:focus {
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+  background-color: transparent;
+  box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--primary-color) 30%, transparent);
+  outline: none;
 }
 
 /* Pagination - theme active page and links with primary color */
