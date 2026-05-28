@@ -98,6 +98,20 @@ docker run -d --name music-postgres \
 
 Update the JDBC URL if your Postgres runs on a different host/port. Hibernate will auto-create the tables (see "Database Schema" below).
 
+sudo -u postgres psql
+
+CREATE USER musicuser WITH PASSWORD 'secret';
+
+CREATE DATABASE musicdb;
+
+ALTER DATABASE musicdb OWNER TO musicuser;
+
+GRANT ALL PRIVILEGES ON DATABASE musicdb TO musicuser;
+
+GRANT ALL ON SCHEMA public TO musicuser;
+
+ALTER SCHEMA public OWNER TO musicuser;
+
 ## API Endpoints
 
 All endpoints return JSON in the format:
