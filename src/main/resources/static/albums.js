@@ -10,60 +10,6 @@ let currentTriggerButton = null;
 let playerControlsInitialized = false;
 
 function initAlbums() {
-  const searchInput = document.getElementById('search-input');
-  const resultsCount = document.getElementById('search-results-count');
-  const matchingCountSpan = document.getElementById('matching-count');
-  const totalCountSpan = document.getElementById('total-count');
-  const albumCards = document.querySelectorAll('.col-md-3.col-sm-6.mb-4');
-
-  const albumsData = Array.from(albumCards).map(card => {
-    const titleEl = card.querySelector('h6');
-    const artistEl = card.querySelector('p.text-muted');
-    const songsEl = card.querySelector('.badge');
-    return {
-      element: card,
-      title: titleEl ? titleEl.textContent.trim() : '',
-      artist: artistEl ? artistEl.textContent.trim() : '',
-      songs: songsEl ? songsEl.textContent.trim() : ''
-    };
-  });
-
-  totalCountSpan.textContent = albumsData.length;
-
-  function performSearch(query) {
-    const normalizedQuery = query.toLowerCase().trim();
-    let matchCount = 0;
-
-    albumsData.forEach(album => {
-      const matchesAlbum = album.title.toLowerCase().includes(normalizedQuery);
-      const matchesArtist = album.artist.toLowerCase().includes(normalizedQuery);
-      const matchesSong = album.songs.toLowerCase().includes(normalizedQuery);
-
-      const isVisible = matchesAlbum || matchesArtist || matchesSong;
-      album.element.style.display = isVisible ? '' : 'none';
-      if (isVisible) matchCount++;
-    });
-
-    matchingCountSpan.textContent = matchCount;
-    if (query) {
-      resultsCount.style.display = 'block';
-    } else {
-      resultsCount.style.display = 'none';
-    }
-  }
-
-  if (searchInput) {
-    if (!searchInput.dataset.searchListenerAttached) {
-      searchInput.dataset.searchListenerAttached = 'true';
-      let debounceTimer;
-      searchInput.addEventListener('input', function() {
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => {
-          performSearch(this.value);
-        }, 150);
-      });
-    }
-  }
   
   const playAlbumButtons = document.querySelectorAll('.play-album-btn');
   playAlbumButtons.forEach(button => {
