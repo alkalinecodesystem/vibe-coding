@@ -14,7 +14,7 @@
 			<form class="row g-3" th:action="@{/albums}" method="get">
 				<div class="col-md-6">
 					<input type="text" id="search-input" name="q" class="form-control"
-						placeholder="Search albums by title, artist, song or genere..." th:value="${searchQuery}">
+						placeholder="Search albums by title, artist or song ..." th:value="${searchQuery}">
 				</div>
 				<div class="col-md-4">
 					<select name="type" class="form-select">
@@ -24,7 +24,6 @@
 						<option value="artist" th:attr="selected=${searchType == 'artist'}">Search by Artist</option>
 						<option value="song" th:attr="selected=${searchType == 'song'}">Search by Song</option>
 					    <option value="songOriginalArtist" th:attr="selected=${searchType == 'songOriginalArtist'}">Search by Song Original Artist</option>
-						<option value="songGenere" th:attr="selected=${searchType == 'songGenere'}">Search by Song Genere</option>
 					</select>
 				</div>
 				<div class="col-md-2">
