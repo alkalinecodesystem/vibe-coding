@@ -218,6 +218,7 @@ public class SongService {
 		List<Song> byTitle = songRepository.findByTitleContainingIgnoreCase(query);
 		List<Song> byAlbum = songRepository.findByAlbum_TitleContainingIgnoreCase(query);
 		List<Song> byArtist = songRepository.findByOriginalArtistContainingIgnoreCase(query);
+	    List<Song> byGenere = songRepository.findByGenereContainingIgnoreCase(query);
 
 		// Combine and remove duplicates
 		java.util.Set<Long> seenIds = new java.util.HashSet<>();
@@ -227,6 +228,7 @@ public class SongService {
 		all.addAll(byTitle);
 		all.addAll(byAlbum);
 		all.addAll(byArtist);
+		all.addAll(byGenere);
 
 		for (Song song : all) {
 			if (seenIds.add(song.getId())) {
@@ -258,6 +260,12 @@ public class SongService {
 	@Transactional(readOnly = true)
 	public Page<SongViewDTO> searchSongsByArtistForViewPaginated(String originalArtist, Pageable pageable) {
 		Page<Song> songs = songRepository.findByOriginalArtistContainingIgnoreCase(originalArtist, pageable);
+		return songs.map(this::convertToViewDTO);
+	}
+    
+	@Transactional(readOnly = true)
+	public Page<SongViewDTO> searchSongsByGenereForViewPaginated(String originalArtist, Pageable pageable) {
+		Page<Song> songs = songRepository.findByGenereContainingIgnoreCase(originalArtist, pageable);
 		return songs.map(this::convertToViewDTO);
 	}
 

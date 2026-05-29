@@ -14,7 +14,7 @@
 			<form class="row g-3" th:action="@{/songs}" method="get">
 				<div class="col-md-6">
 					<input type="text" name="q" class="form-control"
-						placeholder="Search songs by title, album, or artist..." th:value="${searchQuery}">
+						placeholder="Search songs by title, album, artist or genere..." th:value="${searchQuery}">
 				</div>
 				<div class="col-md-4">
 					<select name="type" class="form-select">
@@ -23,6 +23,7 @@
 						<option value="title" th:selected="${searchType == 'title'}">Search by Title</option>
 						<option value="album" th:selected="${searchType == 'album'}">Search by Album</option>
 						<option value="artist" th:selected="${searchType == 'artist'}">Search by Artist</option>
+						<option value="genere" th:selected="${searchType == 'genere'}">Search by Genere</option>
 					</select>
 				</div>
 				<div class="col-md-2">

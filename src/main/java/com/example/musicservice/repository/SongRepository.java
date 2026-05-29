@@ -17,9 +17,13 @@ public interface SongRepository extends JpaRepository<Song, Long> {
 
 	List<Song> findByOriginalArtistContainingIgnoreCase(String originalArtist);
 
+	List<Song> findByGenereContainingIgnoreCase(String genere);
+
 	Page<Song> findByTitleContainingIgnoreCase(String title, Pageable pageable);
 
 	Page<Song> findByAlbum_TitleContainingIgnoreCaseOrderByTrackNumberAsc(String albumTitle, Pageable pageable);
 
 	Page<Song> findByOriginalArtistContainingIgnoreCase(String originalArtist, Pageable pageable);
+    
+	Page<Song> findByGenereContainingIgnoreCase(String genere, Pageable pageable);
 }

@@ -163,6 +163,9 @@ public class ThymeleafController {
 			case "artist":
 				songPage = songService.searchSongsByArtistForViewPaginated(query, pageable);
 				break;
+			case "genere":
+				songPage = songService.searchSongsByGenereForViewPaginated(query, pageable);
+				break;
 			case "all":
 				songPage = songService.searchSongsAllFieldsForViewPaginated(query, pageable);
 				break;
