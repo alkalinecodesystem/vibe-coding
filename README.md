@@ -156,7 +156,7 @@ curl -X POST http://localhost:8081/api/artists \
 | GET | `/api/albums/search/title?q={query}` | Search albums by title |
 | GET | `/api/albums/search/artist?q={query}` | Search albums by artist name |
 | PUT | `/api/albums/{id}` | Update album |
-| PATCH | `/api/albums/{id}/genre?genre={genre}` | Update album genre only |
+| PATCH | `/api/albums/{id}/genere?genere={genere}` | Update album genere only |
 | DELETE | `/api/albums/{id}` | Delete album |
 | POST | `/api/albums/{id}/cover` | Upload/update album cover image |
 | GET | `/api/albums/{id}/cover` | Download album cover image |
@@ -170,9 +170,9 @@ curl -X POST http://localhost:8081/api/albums \
   -d '{"title":"Abbey Road","releaseYear":1969,"artistId":1}'
 ```
 
-**Update genre only:**
+**Update genere only:**
 ```bash
-curl -X PATCH "http://localhost:8081/api/albums/1/genre?genre=Rock"
+curl -X PATCH "http://localhost:8081/api/albums/1/genere?genere=Rock"
 ```
 
 **Upload album cover:**
@@ -208,7 +208,7 @@ curl -X GET "http://localhost:8081/api/albums/with-covers?page=0&size=20&sort=id
 ```bash
 curl -X POST http://localhost:8081/api/songs \
   -H "Content-Type: application/json" \
-  -d '{"title":"Come Together","trackNumber":1,"durationSeconds":259,"genre":"Rock","albumId":1}'
+  -d '{"title":"Come Together","trackNumber":1,"durationSeconds":259,"genere":"Rock","albumId":1}'
 ```
 
 **Example - Get Song Response (after ZIP upload):**
@@ -220,7 +220,7 @@ curl -X POST http://localhost:8081/api/songs \
     "title": "Come Together",
     "trackNumber": 1,
     "durationSeconds": 259,
-    "genre": "Rock",
+    "genere": "Rock",
     "filePath": "/tmp/music-extracted/20240429_211739_1234abcd/The Beatles/Abbey Road/01 - Come Together.mp3",
     "album": {
       "id": 1,
@@ -393,7 +393,7 @@ Result: `Album.zip` (containing `Album/...` but without the timestamp path).
 Optional tags:
 - `TRACK` (track number)
 - `YEAR` (release year)
-- `GENRE` (genre)
+- `GENRE` (genere)
 - Duration is read from audio header
 
 **Note:** Duplicate artists (by name) are automatically detected and reused. Albums are matched by title only (case-insensitive). When duplicates are detected, the API returns a 409 warning so the client can ask the user for confirmation before proceeding with `?force=true`.
@@ -428,7 +428,7 @@ The service includes a Thymeleaf-based web UI for managing your music collection
 Shows total counts (artists, albums, songs, playlists, covers) and recently added albums with covers.
 
 **Albums Page:**
-Grid of album cards showing cover art, title, artist, year, genre, and song count.
+Grid of album cards showing cover art, title, artist, year, genere, and song count.
 
 **Songs Page:**
 Table view with song details including file path, album, artist, with pagination.
@@ -450,7 +450,7 @@ Drag-and-drop ZIP uploader with progress indicator and status messages.
 - `id` (auto-generated)
 - `title` (required, 2-200 chars)
 - `releaseYear` (optional, 1000-2100)
-- `genre` (optional, max 50 chars)
+- `genere` (optional, max 50 chars)
 - `coverImage` (binary, optional JPEG/PNG up to 5MB)
 - `coverContentType` (MIME type, e.g., `image/jpeg`)
 - `hasCover` (boolean, derived field in responses)
@@ -461,7 +461,7 @@ Drag-and-drop ZIP uploader with progress indicator and status messages.
 - `title` (required, 2-200 chars)
 - `trackNumber` (optional, 1-999)
 - `durationSeconds` (optional)
-- `genre` (optional, max 50 chars)
+- `genere` (optional, max 50 chars)
 - `filePath` (optional, absolute path to the audio file on server after extraction, max 500 chars)
 - `originalArtist` (optional, max 100 chars)
 - `album` (many-to-one relationship)
@@ -525,7 +525,7 @@ CREATE TABLE albums (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
   title VARCHAR(200) NOT NULL,
   release_year INTEGER,
-  genre VARCHAR(50),
+  genere VARCHAR(50),
   cover_content_type VARCHAR(50),
   cover_image BLOB,
   artist_id BIGINT NOT NULL,
@@ -537,7 +537,7 @@ CREATE TABLE songs (
   title VARCHAR(200) NOT NULL,
   track_number INTEGER,
   duration_seconds INTEGER,
-  genre VARCHAR(50),
+  genere VARCHAR(50),
   file_path VARCHAR(500),
   original_artist VARCHAR(100),
   album_id BIGINT NOT NULL,

@@ -49,7 +49,7 @@ public class SongService {
 		song.setTitle(request.getTitle());
 		song.setTrackNumber(request.getTrackNumber());
 		song.setDurationSeconds(request.getDurationSeconds());
-		song.setGenre(request.getGenre());
+		song.setGenere(request.getGenere());
 		song.setAlbum(album);
 
 		Song saved = songRepository.save(song);
@@ -159,7 +159,7 @@ public class SongService {
 		song.setTitle(request.getTitle());
 		song.setTrackNumber(request.getTrackNumber());
 		song.setDurationSeconds(request.getDurationSeconds());
-		song.setGenre(request.getGenre());
+		song.setGenere(request.getGenere());
 		song.setAlbum(album);
 
 		Song saved = songRepository.save(song);
@@ -184,7 +184,7 @@ public class SongService {
 		response.setTitle(song.getTitle());
 		response.setTrackNumber(song.getTrackNumber());
 		response.setDurationSeconds(song.getDurationSeconds());
-		response.setGenre(song.getGenre());
+		response.setGenere(song.getGenere());
 		response.setFilePath(song.getFilePath());
 		response.setOriginalArtist(song.getOriginalArtist());
 
@@ -276,7 +276,7 @@ public class SongService {
 		dto.setTitle(song.getTitle());
 		dto.setTrackNumber(song.getTrackNumber());
 		dto.setDurationSeconds(song.getDurationSeconds());
-		dto.setGenre(song.getGenre());
+		dto.setGenere(song.getGenere());
 		dto.setFilePath(song.getFilePath());
 		dto.setOriginalArtist(song.getOriginalArtist());
 

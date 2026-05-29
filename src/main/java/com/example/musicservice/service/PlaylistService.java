@@ -268,7 +268,7 @@ public class PlaylistService {
 		summary.setTitle(song.getTitle());
 		summary.setTrackNumber(song.getTrackNumber());
 		summary.setFormattedDuration(song.getFormattedDuration());
-		summary.setGenre(song.getGenre());
+		summary.setGenere(song.getGenere());
 		summary.setOriginalArtist(song.getOriginalArtist());
 		summary.setFilePath(song.getFilePath());
 

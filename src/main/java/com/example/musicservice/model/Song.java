@@ -38,8 +38,8 @@ public class Song {
 	@Column(name = "duration_seconds")
 	private Integer durationSeconds;
 
-	@Size(max = 50, message = "Genre cannot exceed 50 characters")
-	private String genre;
+	@Size(max = 50, message = "Genere cannot exceed 50 characters")
+	private String genere;
 
 	@Transient
 	public String getFormattedDuration() {

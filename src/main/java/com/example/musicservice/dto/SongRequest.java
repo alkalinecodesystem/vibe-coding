@@ -25,7 +25,7 @@ public class SongRequest {
 	private Integer durationSeconds;
 
 	@Size(max = 50)
-	private String genre;
+	private String genere;
 
 	@NotNull(message = "Album ID is required")
 	@Min(value = 1, message = "Album ID must be positive")

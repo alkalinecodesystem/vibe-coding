@@ -109,7 +109,7 @@ public class ZipUploadService {
 					String songTitle = tag.getFirst(FieldKey.TITLE);
 					String trackStr = tag.getFirst(FieldKey.TRACK);
 					String durationStr = String.valueOf(audio.getAudioHeader().getTrackLength());
-					String genre = tag.getFirst(FieldKey.GENRE);
+					String genere = tag.getFirst(FieldKey.GENRE);
 
 					if (artistName == null || artistName.trim().isEmpty()) {
 						logger.warn("Missing artist tag in file: {}", audioFile.getName());
@@ -166,8 +166,8 @@ public class ZipUploadService {
 							newAlbum.setTitle(albumTitle.trim());
 							// Set the artist from this first occurrence
 							newAlbum.setArtist(artist);
-							// Extract genre, year, cover as before
-							newAlbum.setGenre(genre != null ? genre.trim() : null);
+							// Extract genere, year, cover as before
+							newAlbum.setGenere(genere != null ? genere.trim() : null);
 							String year = tag.getFirst(FieldKey.YEAR);
 							if (year != null && !year.trim().isEmpty()) {
 								try {
@@ -239,7 +239,7 @@ public class ZipUploadService {
 					song.setTitle(songTitle.trim());
 					song.setTrackNumber(trackNumber);
 					song.setDurationSeconds(duration);
-					song.setGenre(genre != null ? genre.trim() : null);
+					song.setGenere(genere != null ? genere.trim() : null);
 					song.setFilePath(audioFile.getAbsolutePath());
 					song.setOriginalArtist(originalArtistToStore);
 					song.setAlbum(album);

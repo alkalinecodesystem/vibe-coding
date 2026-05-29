@@ -14,7 +14,7 @@ public class AlbumViewDTO {
 	private Long id;
 	private String title;
 	private Integer releaseYear;
-	private String genre;
+	private String genere;
 	private String artistName;
 	private Long artistId;
 	private Integer songCount;

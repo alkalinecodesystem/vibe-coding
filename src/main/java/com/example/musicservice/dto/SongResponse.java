@@ -12,7 +12,7 @@ public class SongResponse {
 	private String title;
 	private Integer trackNumber;
 	private Integer durationSeconds;
-	private String genre;
+	private String genere;
 	private String filePath;
 	private String originalArtist; // artista original del tag
 	private AlbumSummary album;

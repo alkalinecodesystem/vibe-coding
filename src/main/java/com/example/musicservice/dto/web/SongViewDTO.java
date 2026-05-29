@@ -12,7 +12,7 @@ public class SongViewDTO {
 	private String title;
 	private Integer trackNumber;
 	private Integer durationSeconds;
-	private String genre;
+	private String genere;
 	private String filePath;
 	private String originalArtist; // artista original del tag MP3
 	private AlbumViewDTO album;

@@ -351,7 +351,7 @@ function setupPlaylistPlayer(playlistData) {
                     <th>Title</th>
                     <th>Track</th>
                     <th>Duration</th>
-                    <th>Genre</th>
+                    <th>Genere</th>
                     <th>Artist</th>
                     <th>Play</th>
                 </tr>
@@ -369,7 +369,7 @@ function setupPlaylistPlayer(playlistData) {
                 <td><strong>${song.title || ''}</strong></td>
                 <td>${song.trackNumber ?? '-'}</td>
                 <td>${song.formattedDuration ?? ''}</td>
-                <td>${song.genre ? `<span class="badge bg-secondary">${song.genre}</span>` : '-'}</td>
+                <td>${song.genere ? `<span class="badge bg-secondary">${song.genere}</span>` : '-'}</td>
                 <td>${song.originalArtist ?? ''}</td>
                 <td>
                     <button class="btn btn-sm btn-outline-primary playlist-play-song-btn" data-song-index="${index}">

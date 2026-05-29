@@ -74,7 +74,7 @@
 							<th>Title</th>
 							<th>Track</th>
 							<th>Duration</th>
-							<th>Genre</th>
+							<th>Genere</th>
 							<th>Album</th>
 							<th>Artist</th>
 							<th width="100">Actions</th>
@@ -92,7 +92,7 @@
 							<td th:text="${song.trackNumber}?:'-'">1</td>
 							<td th:text="${song.formattedDuration}">3:30</td>
 							<td>
-								<span class="badge bg-secondary rounded-pill" th:text="${song.genre}?:'-'">Rock</span>
+								<span class="badge bg-secondary rounded-pill" th:text="${song.genere}?:'-'">Rock</span>
 							</td>
 							<td th:text="${song.album?.title}">Album</td>
 							<td th:text="${song.originalArtist}">Artist</td>

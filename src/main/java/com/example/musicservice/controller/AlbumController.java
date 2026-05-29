@@ -71,6 +71,9 @@ public class AlbumController {
 			case "songOriginalArtist":
 				albums = albumService.searchAlbumsBySongOriginalArtist(query);
 				break;
+			case "songGenere":
+				albums = albumService.searchAlbumsBySongGenere(query);
+				break;
 			case "all":
 			default:
 				albums = albumService.searchAlbumsAllFields(query);
@@ -111,11 +114,11 @@ public class AlbumController {
 		return ResponseEntity.ok(ApiResponse.success("Album files deleted from disk successfully"));
 	}
 
-	@PatchMapping("/{id}/genre")
-	public ResponseEntity<ApiResponse<AlbumResponse>> updateAlbumGenre(@PathVariable Long id,
-			@RequestParam String genre) {
-		AlbumResponse response = albumService.updateGenre(id, genre);
-		return ResponseEntity.ok(ApiResponse.success("Album genre updated successfully", response));
+	@PatchMapping("/{id}/genere")
+	public ResponseEntity<ApiResponse<AlbumResponse>> updateAlbumGenere(@PathVariable Long id,
+			@RequestParam String genere) {
+		AlbumResponse response = albumService.updateGenere(id, genere);
+		return ResponseEntity.ok(ApiResponse.success("Album genere updated successfully", response));
 	}
 
 	@PostMapping("/{id}/cover")

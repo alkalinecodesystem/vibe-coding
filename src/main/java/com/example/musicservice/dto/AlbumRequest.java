@@ -22,7 +22,7 @@ public class AlbumRequest {
 	private Integer releaseYear;
 
 	@Size(max = 50)
-	private String genre;
+	private String genere;
 
 	@NotNull(message = "Artist ID is required")
 	@Min(value = 1, message = "Artist ID must be positive")

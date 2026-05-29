@@ -42,7 +42,7 @@ public class PlaylistResponse {
 		private String title;
 		private Integer trackNumber;
 		private String formattedDuration;
-		private String genre;
+		private String genere;
 		private String originalArtist;
 		private String filePath;
 		private AlbumSummary album;

@@ -31,4 +31,6 @@ public interface AlbumRepository extends JpaRepository<Album, Long> {
 
 	List<Album> findBySongs_OriginalArtistContainingIgnoreCase(String songOriginalArtist);
 
+	List<Album> findBySongs_GenereContainingIgnoreCase(String songGenere);
+
 }

@@ -124,7 +124,7 @@ function initAlbums() {
           table.className = 'table table-hover mb-0';
           table.innerHTML = `
             <thead class="table-light">
-              <tr><th>#</th><th>Title</th><th>Track</th><th>Duration</th><th>Genre</th><th>Artist</th><th>Play</th></tr>
+              <tr><th>#</th><th>Title</th><th>Track</th><th>Duration</th><th>Genere</th><th>Artist</th><th>Play</th></tr>
             </thead>
             <tbody></tbody>
           `;
@@ -136,7 +136,7 @@ function initAlbums() {
               <td><strong>${song.title || ''}</strong></td>
               <td>${song.trackNumber ?? '-'}</td>
               <td>${song.formattedDuration ?? ''}</td>
-              <td>${song.genre ? `<span class="badge bg-secondary">${song.genre}</span>` : '-'}</td>
+              <td>${song.genere ? `<span class="badge bg-secondary">${song.genere}</span>` : '-'}</td>
               <td>${song.originalArtist ?? (data.originalArtist || '')}</td>
               <td><button class="btn btn-sm btn-outline-primary play-song-btn" data-song-index="${idx}"><i class="bi bi-play-circle"></i></button></td>
             `;

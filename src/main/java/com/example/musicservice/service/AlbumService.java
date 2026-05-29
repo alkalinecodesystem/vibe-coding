@@ -57,7 +57,7 @@ public class AlbumService {
 		Album album = new Album();
 		album.setTitle(normalizedTitle);
 		album.setReleaseYear(request.getReleaseYear());
-		album.setGenre(request.getGenre());
+		album.setGenere(request.getGenere());
 		album.setArtist(artist);
 
 		Album saved = albumRepository.save(album);
@@ -115,6 +115,14 @@ public class AlbumService {
 	}
 
 	@Transactional(readOnly = true)
+	public List<AlbumResponse> searchAlbumsBySongGenere(String songGenere) {
+		logger.debug("Searching albums by song genere: {}", songGenere);
+		return albumRepository.findBySongs_TitleContainingIgnoreCase(songGenere).stream().map(this::convertToResponse)
+				.collect(Collectors.toList());
+	}
+
+
+	@Transactional(readOnly = true)
 	public List<AlbumResponse> searchAlbumsAllFields(String query) {
 		logger.debug("Searching albums by all fields: {}", query);
 		List<Album> byTitle = albumRepository.findByTitleContainingIgnoreCase(query);
@@ -170,6 +178,14 @@ public class AlbumService {
 				.collect(Collectors.toList());
 	}
 
+    @Transactional(readOnly = true)
+	public List<AlbumViewDTO> searchAlbumsBySongGenereForView(String songGenere) {
+		logger.debug("Searching albums by song genere for view: {}", songGenere);
+		return albumRepository.findBySongs_OriginalArtistContainingIgnoreCase(songGenere).stream().map(this::convertToViewDTO)
+				.collect(Collectors.toList());
+	}
+
+
 	@Transactional(readOnly = true)
 	public List<AlbumViewDTO> searchAlbumsAllFieldsForView(String query) {
 		logger.debug("Searching albums by all fields for view: {}", query);
@@ -177,6 +193,7 @@ public class AlbumService {
 		List<Album> byArtist = albumRepository.findByArtist_NameContainingIgnoreCase(query);
 		List<Album> bySong = albumRepository.findBySongs_TitleContainingIgnoreCase(query);
 		List<Album> byOriginalArtist = albumRepository.findBySongs_OriginalArtistContainingIgnoreCase(query);
+		List<Album> byGenere = albumRepository.findBySongs_GenereContainingIgnoreCase(query);
 
 		// Combine and remove duplicates
 		java.util.Set<Long> seenIds = new java.util.HashSet<>();
@@ -187,6 +204,7 @@ public class AlbumService {
 		all.addAll(byArtist);
 		all.addAll(bySong);
 		all.addAll(byOriginalArtist);
+		all.addAll(byGenere);
 
 		for (Album album : all) {
 			if (seenIds.add(album.getId())) {
@@ -217,7 +235,7 @@ public class AlbumService {
 
 		album.setTitle(normalizedTitle);
 		album.setReleaseYear(request.getReleaseYear());
-		album.setGenre(request.getGenre());
+		album.setGenere(request.getGenere());
 		album.setArtist(artist);
 
 		Album saved = albumRepository.save(album);
@@ -299,15 +317,15 @@ public class AlbumService {
 		return albumRepository.findByCoverImageIsNotNull(pageable).map(this::convertToResponse);
 	}
 
-	public AlbumResponse updateGenre(Long id, String genre) {
-		if (genre != null && genre.length() > 50) {
-			throw new IllegalArgumentException("Genre cannot exceed 50 characters");
+	public AlbumResponse updateGenere(Long id, String genere) {
+		if (genere != null && genere.length() > 50) {
+			throw new IllegalArgumentException("Genere cannot exceed 50 characters");
 		}
 
 		Album album = albumRepository.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("Album not found with id: " + id));
 
-		album.setGenre(genre != null ? genre.trim() : null);
+		album.setGenere(genere != null ? genere.trim() : null);
 		Album saved = albumRepository.save(album);
 		return convertToResponse(saved);
 	}
@@ -381,7 +399,7 @@ public class AlbumService {
 		response.setId(album.getId());
 		response.setTitle(album.getTitle());
 		response.setReleaseYear(album.getReleaseYear());
-		response.setGenre(album.getGenre());
+		response.setGenere(album.getGenere());
 
 		AlbumResponse.ArtistSummary artistSummary = new AlbumResponse.ArtistSummary();
 		artistSummary.setId(album.getArtist().getId());
@@ -394,7 +412,7 @@ public class AlbumService {
 			summary.setTitle(song.getTitle());
 			summary.setTrackNumber(song.getTrackNumber());
 			summary.setDurationSeconds(song.getDurationSeconds());
-			summary.setGenre(song.getGenre());
+			summary.setGenere(song.getGenere());
 			summary.setFilePath(song.getFilePath());
 			summary.setOriginalArtist(song.getOriginalArtist());
 			summary.setFormattedDuration(song.getFormattedDuration());
@@ -441,7 +459,7 @@ public class AlbumService {
 		dto.setId(album.getId());
 		dto.setTitle(album.getTitle());
 		dto.setReleaseYear(album.getReleaseYear());
-		dto.setGenre(album.getGenre());
+		dto.setGenere(album.getGenere());
 		dto.setHasCover(album.getCoverImage() != null);
 		if (album.getCoverImage() != null) {
 			dto.setCoverContentType(album.getCoverContentType());
@@ -469,7 +487,7 @@ public class AlbumService {
 				sDTO.setTitle(song.getTitle());
 				sDTO.setTrackNumber(song.getTrackNumber());
 				sDTO.setDurationSeconds(song.getDurationSeconds());
-				sDTO.setGenre(song.getGenre());
+				sDTO.setGenere(song.getGenere());
 				sDTO.setFilePath(song.getFilePath());
 				sDTO.setOriginalArtist(song.getOriginalArtist());
 				// Don't set album to avoid recursion

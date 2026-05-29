@@ -40,9 +40,9 @@ public class Album {
 	@Column(name = "release_year")
 	private Integer releaseYear;
 
-	@Size(max = 50, message = "Genre cannot exceed 50 characters")
+	@Size(max = 50, message = "Genere cannot exceed 50 characters")
 	@Column(length = 50)
-	private String genre;
+	private String genere;
 
 	@Lob
 	@Column(name = "cover_image")

@@ -13,7 +13,7 @@ public class AlbumResponse {
 	private Long id;
 	private String title;
 	private Integer releaseYear;
-	private String genre;
+	private String genere;
 	private ArtistSummary artist;
 	private List<SongSummary> songs;
 	private boolean hasCover;
@@ -50,7 +50,7 @@ public class AlbumResponse {
 		private String title;
 		private Integer trackNumber;
 		private Integer durationSeconds;
-		private String genre;
+		private String genere;
 		private String filePath; // Add file path for audio playback
 		private String originalArtist;
 		private String formattedDuration;

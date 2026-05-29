@@ -42,9 +42,9 @@
 							<th>Release Year</th>
 							<td th:text="${album.releaseYear}">1969</td>
 						</tr>
-						<tr th:if="${album.genre}">
-							<th>Genre</th>
-							<td th:text="${album.genre}">Rock</td>
+						<tr th:if="${album.genere}">
+							<th>Genere</th>
+							<td th:text="${album.genere}">Rock</td>
 						</tr>
 						<tr>
 							<th>Songs</th>
@@ -70,7 +70,7 @@
 									<th>Title</th>
 									<th>Track</th>
 									<th>Duration</th>
-									<th>Genre</th>
+									<th>Genere</th>
 									<th>Artist</th>
 									<th>File Path</th>
 								</tr>
@@ -83,9 +83,9 @@
 									</td>
 									<td th:text="${song.trackNumber}?:'-'">1</td>
 									<td th:text="${song.formattedDuration}">3:30</td>
-									<td th:if="${song.genre != null}"><span class="badge bg-secondary"
-											th:text="${song.genre}">Rock</span></td>
-									<td th:if="${song.genre == null}">-</td>
+									<td th:if="${song.genere != null}"><span class="badge bg-secondary"
+											th:text="${song.genere}">Rock</span></td>
+									<td th:if="${song.genere == null}">-</td>
 									<td th:text="${song.originalArtist}">
 										Artist</td>
 									<td>
