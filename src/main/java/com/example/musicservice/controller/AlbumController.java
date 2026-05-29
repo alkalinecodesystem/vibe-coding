@@ -68,6 +68,9 @@ public class AlbumController {
 			case "song":
 				albums = albumService.searchAlbumsBySong(query);
 				break;
+			case "songOriginalArtist":
+				albums = albumService.searchAlbumsBySongOriginalArtist(query);
+				break;
 			case "all":
 			default:
 				albums = albumService.searchAlbumsAllFields(query);

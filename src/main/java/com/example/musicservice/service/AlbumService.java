@@ -108,11 +108,19 @@ public class AlbumService {
 	}
 
 	@Transactional(readOnly = true)
+	public List<AlbumResponse> searchAlbumsBySongOriginalArtist(String songOriginalArtist) {
+		logger.debug("Searching albums by song originalArtist: {}", songOriginalArtist);
+		return albumRepository.findBySongs_TitleContainingIgnoreCase(songOriginalArtist).stream().map(this::convertToResponse)
+				.collect(Collectors.toList());
+	}
+
+	@Transactional(readOnly = true)
 	public List<AlbumResponse> searchAlbumsAllFields(String query) {
 		logger.debug("Searching albums by all fields: {}", query);
 		List<Album> byTitle = albumRepository.findByTitleContainingIgnoreCase(query);
 		List<Album> byArtist = albumRepository.findByArtist_NameContainingIgnoreCase(query);
 		List<Album> bySong = albumRepository.findBySongs_TitleContainingIgnoreCase(query);
+		List<Album> byOriginalArtist = albumRepository.findBySongs_OriginalArtistContainingIgnoreCase(query);
 
 		// Combine and remove duplicates
 		java.util.Set<Long> seenIds = new java.util.HashSet<>();
@@ -122,6 +130,7 @@ public class AlbumService {
 		all.addAll(byTitle);
 		all.addAll(byArtist);
 		all.addAll(bySong);
+		all.addAll(byOriginalArtist);
 
 		for (Album album : all) {
 			if (seenIds.add(album.getId())) {
@@ -155,11 +164,19 @@ public class AlbumService {
 	}
 
 	@Transactional(readOnly = true)
+	public List<AlbumViewDTO> searchAlbumsBySongOriginalArtistForView(String songOriginalArtist) {
+		logger.debug("Searching albums by song originalArtist for view: {}", songOriginalArtist);
+		return albumRepository.findBySongs_OriginalArtistContainingIgnoreCase(songOriginalArtist).stream().map(this::convertToViewDTO)
+				.collect(Collectors.toList());
+	}
+
+	@Transactional(readOnly = true)
 	public List<AlbumViewDTO> searchAlbumsAllFieldsForView(String query) {
 		logger.debug("Searching albums by all fields for view: {}", query);
 		List<Album> byTitle = albumRepository.findByTitleContainingIgnoreCase(query);
 		List<Album> byArtist = albumRepository.findByArtist_NameContainingIgnoreCase(query);
 		List<Album> bySong = albumRepository.findBySongs_TitleContainingIgnoreCase(query);
+		List<Album> byOriginalArtist = albumRepository.findBySongs_OriginalArtistContainingIgnoreCase(query);
 
 		// Combine and remove duplicates
 		java.util.Set<Long> seenIds = new java.util.HashSet<>();
@@ -169,6 +186,7 @@ public class AlbumService {
 		all.addAll(byTitle);
 		all.addAll(byArtist);
 		all.addAll(bySong);
+		all.addAll(byOriginalArtist);
 
 		for (Album album : all) {
 			if (seenIds.add(album.getId())) {

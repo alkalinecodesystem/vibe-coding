@@ -81,6 +81,9 @@ public class ThymeleafController {
 			case "song":
 				albums = albumService.searchAlbumsBySongForView(query);
 				break;
+			case "songOriginalArtist":
+				albums = albumService.searchAlbumsBySongOriginalArtistForView(query);
+				break;
 			case "all":
 			default:
 				albums = albumService.searchAlbumsAllFieldsForView(query);

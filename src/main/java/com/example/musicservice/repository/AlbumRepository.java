@@ -28,4 +28,7 @@ public interface AlbumRepository extends JpaRepository<Album, Long> {
 
 	@Query("SELECT DISTINCT a FROM Album a WHERE a.id = :id")
 	Optional<Album> findByIdWithSongs(@Param("id") Long id);
+
+	List<Album> findBySongs_OriginalArtistContainingIgnoreCase(String songOriginalArtist);
+
 }
