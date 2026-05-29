@@ -129,6 +129,7 @@ public class AlbumService {
 		List<Album> byArtist = albumRepository.findByArtist_NameContainingIgnoreCase(query);
 		List<Album> bySong = albumRepository.findBySongs_TitleContainingIgnoreCase(query);
 		List<Album> byOriginalArtist = albumRepository.findBySongs_OriginalArtistContainingIgnoreCase(query);
+        List<Album> byGenere = albumRepository.findBySongs_GenereContainingIgnoreCase(query);
 
 		// Combine and remove duplicates
 		java.util.Set<Long> seenIds = new java.util.HashSet<>();
@@ -139,6 +140,7 @@ public class AlbumService {
 		all.addAll(byArtist);
 		all.addAll(bySong);
 		all.addAll(byOriginalArtist);
+		all.addAll(byGenere);
 
 		for (Album album : all) {
 			if (seenIds.add(album.getId())) {
