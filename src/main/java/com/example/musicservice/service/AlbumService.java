@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -426,7 +427,8 @@ public class AlbumService {
 
 	@Transactional(readOnly = true)
 	public List<AlbumViewDTO> getAllAlbumsForView() {
-		List<Album> albums = albumRepository.findAll();
+		
+		List<Album> albums = albumRepository.findRandom(PageRequest.of(0, 12));
 		// Remove duplicates by album title only (keep most recent for each title)
 		java.util.Map<String, Album> uniqueMap = new java.util.LinkedHashMap<>();
 		albums.stream().sorted((a, b) -> Long.compare(b.getId(), a.getId())).forEach(album -> {
@@ -499,5 +501,13 @@ public class AlbumService {
 		}
 
 		return dto;
+	}
+
+	public long getAllAlbumsCount(){
+		return albumRepository.count();
+	}
+
+	public long getAllCoversCount() {
+		return albumRepository.countByCoverImageIsNotNull();
 	}
 }

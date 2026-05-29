@@ -33,4 +33,8 @@ public interface AlbumRepository extends JpaRepository<Album, Long> {
 
 	List<Album> findBySongs_GenereContainingIgnoreCase(String songGenere);
 
+	long countByCoverImageIsNotNull();
+
+	@Query("SELECT a FROM Album a ORDER BY FUNCTION('RANDOM')")
+	List<Album> findRandom(Pageable pageable);
 }

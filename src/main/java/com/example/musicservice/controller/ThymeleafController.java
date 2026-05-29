@@ -38,23 +38,16 @@ public class ThymeleafController {
 	public String home(Model model) {
 		model.addAttribute("title", "Music Manager - Dashboard");
 
-		List<AlbumViewDTO> allAlbums = albumService.getAllAlbumsForView();
-		List<SongViewDTO> allSongs = songService.getAllSongsForView();
-
-		long coversCount = allAlbums.stream().filter(AlbumViewDTO::isHasCover).count();
-
 		// Get random 12 albums for main page
-		List<AlbumViewDTO> randomAlbums = allAlbums.stream()
-				.collect(Collectors.collectingAndThen(Collectors.toList(), list -> {
-					Collections.shuffle(list);
-					return list.stream().limit(12).toList();
-				}));
+		List<AlbumViewDTO> randomAlbums = albumService.getAllAlbumsForView();
+		long totalArtist = songService.getAllOriginalArtistsCount();
+        long totalAlbums = albumService.getAllAlbumsCount();
+        long totalSongs = songService.getAllSongsCount();
+		long coversCount = albumService.getAllCoversCount();
 
-		long artistCount = allAlbums.stream().map(AlbumViewDTO::getArtistName).distinct().count();
-
-		model.addAttribute("totalArtists", artistCount);
-		model.addAttribute("totalAlbums", allAlbums.size());
-		model.addAttribute("totalSongs", allSongs.size());
+		model.addAttribute("totalArtists", totalArtist);
+		model.addAttribute("totalAlbums", totalAlbums);
+		model.addAttribute("totalSongs", totalSongs);
 		model.addAttribute("totalCovers", coversCount);
 		model.addAttribute("randomAlbums", randomAlbums);
 		model.addAttribute("activeMenu", "dashboard");
@@ -91,11 +84,7 @@ public class ThymeleafController {
 			}
 		} else {
 			// Show random 12 albums as main feature
-			albums = albumService.getAllAlbumsForView().stream()
-					.collect(Collectors.collectingAndThen(Collectors.toList(), list -> {
-						Collections.shuffle(list);
-						return list.stream().limit(12).toList();
-					}));
+			albums = albumService.getAllAlbumsForView();
 		}
 
 		model.addAttribute("albums", albums);

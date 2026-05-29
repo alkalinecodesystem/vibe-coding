@@ -298,4 +298,12 @@ public class SongService {
 		}
 		return dto;
 	}
+
+    public long getAllSongsCount() {
+        return songRepository.count();
+    }
+
+    public long getAllOriginalArtistsCount() {
+        return songRepository.countDistinctOriginalArtist();
+    }
 }
