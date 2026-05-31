@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.musicservice.dto.AlbumRequest;
 import com.example.musicservice.dto.AlbumResponse;
 import com.example.musicservice.dto.ApiResponse;
+import com.example.musicservice.dto.PaginatedResponse;
 import com.example.musicservice.service.AlbumService;
 
 import jakarta.validation.Valid;
@@ -49,13 +50,22 @@ public class AlbumController {
 		return ResponseEntity.ok(ApiResponse.success(response));
 	}
 
+
 	@GetMapping
-	public ResponseEntity<ApiResponse<List<AlbumResponse>>> getAllAlbums(@RequestParam(required = false) String q,
+	public ResponseEntity<ApiResponse<PaginatedResponse<AlbumResponse>>> getAllAlbums(
+			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+		PaginatedResponse<AlbumResponse> response = albumService.getAlbumsPaginated(page, size);
+		return ResponseEntity.ok(ApiResponse.success(response));
+	}
+
+
+	@GetMapping("/search")
+	public ResponseEntity<ApiResponse<List<AlbumResponse>>> searchAlbums(@RequestParam(required = false) String q,
 			@RequestParam(required = false, defaultValue = "all") String type) {
 		List<AlbumResponse> albums;
 
 		if (q == null || q.trim().isEmpty()) {
-			albums = albumService.getAllAlbums();
+			albums = null;
 		} else {
 			String query = q.trim();
 			switch (type.toLowerCase()) {

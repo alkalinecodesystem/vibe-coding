@@ -5,11 +5,15 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.musicservice.dto.ArtistRequest;
 import com.example.musicservice.dto.ArtistResponse;
+import com.example.musicservice.dto.PaginatedResponse;
 import com.example.musicservice.exception.ResourceNotFoundException;
 import com.example.musicservice.model.Artist;
 import com.example.musicservice.repository.ArtistRepository;
@@ -54,6 +58,24 @@ public class ArtistService {
 	public List<ArtistResponse> getAllArtists() {
 		logger.debug("Fetching all artists");
 		return artistRepository.findAll().stream().map(this::convertToResponse).collect(Collectors.toList());
+	}
+
+	@Transactional(readOnly = true)
+	public PaginatedResponse<ArtistResponse> getArtistPaginated(int page, int size) {
+
+		logger.debug("Fetching artist paginated: page={}, size={}", page, size);
+		Pageable pageable = PageRequest.of(page, size);
+		Page<Artist> artistPage;
+		artistPage = artistRepository.findAll(pageable);
+
+		List<ArtistResponse> content = artistPage.getContent().stream().map(this::convertToResponse)
+				.collect(Collectors.toList());
+
+		return new PaginatedResponse<>(content, artistPage.getTotalPages(), artistPage.getTotalElements(),
+				artistPage.getNumber(), artistPage.getSize(), artistPage.isFirst(), artistPage.isLast(),
+				artistPage.hasNext(),
+				artistPage.hasPrevious());
+
 	}
 
 	@Transactional(readOnly = true)

@@ -14,9 +14,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.musicservice.dto.AlbumResponse;
 import com.example.musicservice.dto.ApiResponse;
 import com.example.musicservice.dto.ArtistRequest;
 import com.example.musicservice.dto.ArtistResponse;
+import com.example.musicservice.dto.PaginatedResponse;
 import com.example.musicservice.service.ArtistService;
 
 import jakarta.validation.Valid;
@@ -43,9 +45,10 @@ public class ArtistController {
 	}
 
 	@GetMapping
-	public ResponseEntity<ApiResponse<List<ArtistResponse>>> getAllArtists() {
-		List<ArtistResponse> artists = artistService.getAllArtists();
-		return ResponseEntity.ok(ApiResponse.success(artists));
+	public ResponseEntity<ApiResponse<PaginatedResponse<ArtistResponse>>> getAllArtist(
+			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+		PaginatedResponse<ArtistResponse> response = artistService.getArtistPaginated(page, size);
+		return ResponseEntity.ok(ApiResponse.success(response));
 	}
 
 	@GetMapping("/search")

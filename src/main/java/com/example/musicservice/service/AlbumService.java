@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.musicservice.dto.AlbumRequest;
 import com.example.musicservice.dto.AlbumResponse;
+import com.example.musicservice.dto.PaginatedResponse;
 import com.example.musicservice.dto.web.AlbumViewDTO;
 import com.example.musicservice.exception.ResourceNotFoundException;
 import com.example.musicservice.model.Album;
@@ -79,6 +80,22 @@ public class AlbumService {
 			response.setCoverContentType(album.getCoverContentType());
 		}
 		return response;
+	}
+
+	@Transactional(readOnly = true)
+	public PaginatedResponse<AlbumResponse> getAlbumsPaginated(int page, int size) {
+	    logger.debug("Fetching albums paginated: page={}, size={}", page, size);
+		Pageable pageable = PageRequest.of(page, size);
+		Page<Album> albumPage;
+		albumPage = albumRepository.findAll(pageable);
+
+		List<AlbumResponse> content = albumPage.getContent().stream().map(this::convertToResponse)
+				.collect(Collectors.toList());
+
+		return new PaginatedResponse<>(content, albumPage.getTotalPages(), albumPage.getTotalElements(),
+				albumPage.getNumber(), albumPage.getSize(), albumPage.isFirst(), albumPage.isLast(), albumPage.hasNext(),
+				albumPage.hasPrevious());
+
 	}
 
 	@Transactional(readOnly = true)
@@ -510,4 +527,5 @@ public class AlbumService {
 	public long getAllCoversCount() {
 		return albumRepository.countByCoverImageIsNotNull();
 	}
+
 }
