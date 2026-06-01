@@ -65,28 +65,28 @@ For persistent storage or production use:
 
 1. **Add the PostgreSQL driver** to `pom.xml` (alongside the H2 dependency):
 
-   ```xml
+```xml
    <dependency>
    	<groupId>org.postgresql</groupId>
    	<artifactId>postgresql</artifactId>
    	<scope>runtime</scope>
    </dependency>
-   ```
+```
 
 2. **Configure connection** – either edit `application.properties`
 
-   ```properties
-   # PostgreSQL datasource
-   spring.datasource.url=jdbc:postgresql://localhost:5432/musicdb
-   spring.datasource.driver-class-name=org.postgresql.Driver
-   spring.datasource.username=musicuser
-   spring.datasource.password=secret
+```properties
+# PostgreSQL datasource
+spring.datasource.url=jdbc:postgresql://localhost:5432/musicdb
+spring.datasource.driver-class-name=org.postgresql.Driver
+spring.datasource.username=musicuser
+spring.datasource.password=secret
 
-   # Hibernate settings for Postgres
-   spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
-   spring.jpa.hibernate.ddl-auto=update
-   spring.jpa.show-sql=false
-   ```
+# Hibernate settings for Postgres
+spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=false
+```
 
 **One-liner Postgres via Docker:**
 
@@ -133,7 +133,7 @@ All endpoints return JSON in the format:
 |--------|----------|-------------|
 | POST | `/api/artists` | Create a new artist |
 | GET | `/api/artists/{id}` | Get artist by ID |
-| GET | `/api/artists` | Get all artists |
+| GET | `/api/artists` | Get all artists (paginated) |
 | GET | `/api/artists/search?q={query}` | Search artists by name |
 | PUT | `/api/artists/{id}` | Update artist |
 | DELETE | `/api/artists/{id}` | Delete artist |
@@ -151,7 +151,7 @@ curl -X POST http://localhost:8081/api/artists \
 |--------|----------|-------------|
 | POST | `/api/albums` | Create a new album |
 | GET | `/api/albums/{id}` | Get album by ID |
-| GET | `/api/albums` | Get all albums |
+| GET | `/api/albums` | Get all albums (paginated) |
 | GET | `/api/albums/with-covers` | Get albums with cover images (paginated) |
 | GET | `/api/albums/search/title?q={query}` | Search albums by title |
 | GET | `/api/albums/search/artist?q={query}` | Search albums by artist name |
@@ -197,7 +197,7 @@ curl -X GET "http://localhost:8081/api/albums/with-covers?page=0&size=20&sort=id
 |--------|----------|-------------|
 | POST | `/api/songs` | Create a new song |
 | GET | `/api/songs/{id}` | Get song by ID |
-| GET | `/api/songs` | Get all songs |
+| GET | `/api/songs` | Get all songs (paginated) |
 | GET | `/api/songs/search/title?q={query}` | Search songs by title |
 | GET | `/api/songs/search/album?q={query}` | Search songs by album title |
 | GET | `/api/songs/search/artist?q={query}` | Search songs by artist name |
@@ -240,7 +240,7 @@ curl -X POST http://localhost:8081/api/songs \
 |--------|----------|-------------|
 | POST | `/api/playlists` | Create a new playlist |
 | GET | `/api/playlists/{id}` | Get playlist by ID |
-| GET | `/api/playlists` | Get all playlists |
+| GET | `/api/playlists` | Get all playlists (paginated) |
 | PUT | `/api/playlists/{id}` | Update playlist |
 | DELETE | `/api/playlists/{id}` | Delete playlist |
 | POST | `/api/playlists/{playlistId}/songs/{songId}` | Add song to playlist |
