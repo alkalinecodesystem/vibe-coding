@@ -68,10 +68,10 @@
 								<tr>
 									<th width="60">#</th>
 									<th>Title</th>
+									<th>Artist</th>
 									<th>Track</th>
 									<th>Duration</th>
 									<th>Genere</th>
-									<th>Artist</th>
 									<th>File Path</th>
 								</tr>
 							</thead>
@@ -81,13 +81,12 @@
 									<td>
 										<strong th:text="${song.title}">Song Title</strong>
 									</td>
+									<td th:text="${song.originalArtist}">Artist</td>
 									<td th:text="${song.trackNumber}?:'-'">1</td>
 									<td th:text="${song.formattedDuration}">3:30</td>
 									<td th:if="${song.genere != null}"><span class="badge bg-secondary"
 											th:text="${song.genere}">Rock</span></td>
 									<td th:if="${song.genere == null}">-</td>
-									<td th:text="${song.originalArtist}">
-										Artist</td>
 									<td>
 										<small class="text-muted text-break"
 											th:text="${song.filePath}">/path/to/file.mp3</small>

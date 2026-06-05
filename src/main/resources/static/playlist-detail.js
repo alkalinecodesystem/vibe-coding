@@ -349,10 +349,10 @@ function setupPlaylistPlayer(playlistData) {
                 <tr>
                     <th width="60">#</th>
                     <th>Title</th>
+                    <th>Artist</th>
                     <th>Track</th>
                     <th>Duration</th>
                     <th>Genere</th>
-                    <th>Artist</th>
                     <th>Play</th>
                 </tr>
             </thead>
@@ -367,10 +367,10 @@ function setupPlaylistPlayer(playlistData) {
             tr.innerHTML = `
                 <td>${index + 1}</td>
                 <td><strong>${song.title || ''}</strong></td>
+                <td>${song.originalArtist ?? ''}</td>
                 <td>${song.trackNumber ?? '-'}</td>
                 <td>${song.formattedDuration ?? ''}</td>
                 <td>${song.genere ? `<span class="badge bg-secondary">${song.genere}</span>` : '-'}</td>
-                <td>${song.originalArtist ?? ''}</td>
                 <td>
                     <button class="btn btn-sm btn-outline-primary playlist-play-song-btn" data-song-index="${index}">
                         <i class="bi bi-play-circle"></i>

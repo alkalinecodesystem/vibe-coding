@@ -44,11 +44,11 @@
 						<tr>
 							<th width="60">#</th>
 							<th>Title</th>
+							<th>Artist</th>
+							<th>Album</th>
 							<th>Track</th>
 							<th>Duration</th>
 							<th>Genere</th>
-							<th>Album</th>
-							<th>Artist</th>
 							<th width="100">Actions</th>
 						</tr>
 					</thead>
@@ -61,13 +61,13 @@
 									<span th:text="${song.title}">Song Title</span>
 								</div>
 							</td>
+							<td th:text="${song.originalArtist}">Artist</td>
+							<td th:text="${song.album?.title}">Album</td>
 							<td th:text="${song.trackNumber}?:'-'">1</td>
 							<td th:text="${song.formattedDuration}">3:30</td>
 							<td>
 								<span class="badge bg-secondary rounded-pill" th:text="${song.genere}?:'-'">Rock</span>
 							</td>
-							<td th:text="${song.album?.title}">Album</td>
-							<td th:text="${song.originalArtist}">Artist</td>
 							<td>
 								<button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal"
 									th:data-bs-target="'#songModal' + ${song.id}" title="View details">
