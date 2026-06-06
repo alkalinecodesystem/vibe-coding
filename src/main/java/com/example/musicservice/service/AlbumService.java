@@ -524,6 +524,20 @@ public class AlbumService {
 		return albumRepository.count();
 	}
 
+	@Transactional(readOnly = true)
+	public PaginatedResponse<AlbumResponse> getAlbumsByArtistIdPaginated(Long artistId,String originalArtist, int page, int size) {
+		logger.debug("Fetching albums by artist paginated: artistId={}, page={}, size={}", artistId, page, size);
+		Pageable pageable = PageRequest.of(page, size);
+		Page<Album> albumPage = albumRepository.findByArtistIdOrSongOriginalArtist(artistId, originalArtist, pageable);
+
+		List<AlbumResponse> content = albumPage.getContent().stream().map(this::convertToResponse)
+				.collect(Collectors.toList());
+
+		return new PaginatedResponse<>(content, albumPage.getTotalPages(), albumPage.getTotalElements(),
+				albumPage.getNumber(), albumPage.getSize(), albumPage.isFirst(), albumPage.isLast(),
+				albumPage.hasNext(), albumPage.hasPrevious());
+	}
+
 	public long getAllCoversCount() {
 		return albumRepository.countByCoverImageIsNotNull();
 	}

@@ -26,6 +26,12 @@
 						</a>
 					</li>
 					<li class="nav-item">
+						<a class="nav-link" href="/artists" th:href="@{/artists}"
+							th:classappend="${activeMenu == 'artists'} ? 'active'">
+							<i class="bi bi-people"></i> Artists
+						</a>
+					</li>
+					<li class="nav-item">
 						<a class="nav-link" href="/albums" th:href="@{/albums}"
 							th:classappend="${activeMenu == 'albums'} ? 'active'">
 							<i class="bi bi-record-circle"></i> Albums

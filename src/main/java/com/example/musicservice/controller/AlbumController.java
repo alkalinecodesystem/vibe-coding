@@ -156,4 +156,12 @@ public class AlbumController {
 		Page<AlbumResponse> albums = albumService.getAlbumsWithCoverPaginated(pageable);
 		return ResponseEntity.ok(ApiResponse.success(albums));
 	}
+
+	@GetMapping("/by-artist/{artistId}")
+	public ResponseEntity<ApiResponse<PaginatedResponse<AlbumResponse>>> getAlbumsByArtist(@PathVariable Long artistId,
+			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size,
+			@RequestParam(value = "artistName", required = false) String artistName) {
+		PaginatedResponse<AlbumResponse> response = albumService.getAlbumsByArtistIdPaginated(artistId, artistName, page, size);
+		return ResponseEntity.ok(ApiResponse.success(response));
+	}
 }

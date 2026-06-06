@@ -20,21 +20,30 @@ public interface AlbumRepository extends JpaRepository<Album, Long> {
 
 	List<Album> findBySongs_TitleContainingIgnoreCase(String songTitle);
 
-	Optional<Album> findByTitleIgnoreCaseAndArtist_Id(String title, Long artistId);
-
-	Optional<Album> findByTitleIgnoreCase(String title);
-
-	Page<Album> findByCoverImageIsNotNull(Pageable pageable);
-
-	@Query("SELECT DISTINCT a FROM Album a WHERE a.id = :id")
-	Optional<Album> findByIdWithSongs(@Param("id") Long id);
-
 	List<Album> findBySongs_OriginalArtistContainingIgnoreCase(String songOriginalArtist);
 
 	List<Album> findBySongs_GenereContainingIgnoreCase(String songGenere);
 
-	long countByCoverImageIsNotNull();
+	Optional<Album> findByTitleIgnoreCaseAndArtist_Id(String title, Long artistId);
+
+	Optional<Album> findByTitleIgnoreCase(String title);
+
+	Page<Album> findByArtist_Id(Long artistId, Pageable pageable);
+
+	Page<Album> findByArtist_NameContainingIgnoreCase(String artistName, Pageable pageable);
+
+	Page<Album> findBySongs_OriginalArtistContainingIgnoreCase(String songOriginalArtist, Pageable pageable);
+
+	Page<Album> findByCoverImageIsNotNull(Pageable pageable);
+
+	@Query("SELECT DISTINCT a FROM Album a LEFT JOIN a.songs s WHERE (a.artist.id = :artistId) OR (LOWER(s.originalArtist) = LOWER(:artistName))")
+	Page<Album> findByArtistIdOrSongOriginalArtist(@Param("artistId") Long artistId, @Param("artistName") String artistName, Pageable pageable);
 
 	@Query("SELECT a FROM Album a ORDER BY FUNCTION('RANDOM')")
 	List<Album> findRandom(Pageable pageable);
+
+	@Query("SELECT DISTINCT a FROM Album a WHERE a.id = :id")
+	Optional<Album> findByIdWithSongs(@Param("id") Long id);
+
+	long countByCoverImageIsNotNull();
 }

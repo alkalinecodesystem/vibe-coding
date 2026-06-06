@@ -14,9 +14,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.example.musicservice.dto.ArtistResponse;
+import com.example.musicservice.dto.PaginatedResponse;
 import com.example.musicservice.dto.web.AlbumViewDTO;
 import com.example.musicservice.dto.web.SongViewDTO;
 import com.example.musicservice.service.AlbumService;
+import com.example.musicservice.service.ArtistService;
 import com.example.musicservice.service.PlaylistService;
 import com.example.musicservice.service.SongService;
 
@@ -31,6 +34,7 @@ public class ThymeleafController {
 	private final AlbumService albumService;
 	private final SongService songService;
 	private final PlaylistService playlistService;
+	private final ArtistService artistService;
 
 	@GetMapping("/")
 	public String home(Model model) {
@@ -39,8 +43,8 @@ public class ThymeleafController {
 		// Get random 12 albums for main page
 		List<AlbumViewDTO> randomAlbums = albumService.getAllAlbumsForView();
 		long totalArtist = songService.getAllOriginalArtistsCount();
-        long totalAlbums = albumService.getAllAlbumsCount();
-        long totalSongs = songService.getAllSongsCount();
+		long totalAlbums = albumService.getAllAlbumsCount();
+		long totalSongs = songService.getAllSongsCount();
 		long coversCount = albumService.getAllCoversCount();
 
 		model.addAttribute("totalArtists", totalArtist);
@@ -197,6 +201,41 @@ public class ThymeleafController {
 		model.addAttribute("activeMenu", "playlists");
 		model.addAttribute("contentTemplate", "fragments/playlist-detail");
 		model.addAttribute("contentFragment", "content");
+		return "layout";
+	}
+
+	@GetMapping("/artists")
+	public String artists(Model model, @RequestParam(value = "q", required = false) String searchQuery,
+			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+		model.addAttribute("title", "Artists - Music Manager");
+		model.addAttribute("activeMenu", "artists");
+		model.addAttribute("contentTemplate", "fragments/artists");
+		model.addAttribute("contentFragment", "content");
+		model.addAttribute("searchQuery", searchQuery);
+
+		if (searchQuery != null && !searchQuery.trim().isEmpty()) {
+			List<ArtistResponse> artists = artistService.searchArtists(searchQuery.trim());
+			model.addAttribute("artists", artists);
+			model.addAttribute("currentPage", 0);
+			model.addAttribute("totalPages", 0);
+			model.addAttribute("totalElements", (long) artists.size());
+			model.addAttribute("size", artists.size());
+			model.addAttribute("hasNext", false);
+			model.addAttribute("hasPrevious", false);
+			model.addAttribute("isFirst", true);
+			model.addAttribute("isLast", true);
+		} else {
+			PaginatedResponse<ArtistResponse> paginated = artistService.getArtistPaginated(page, size);
+			model.addAttribute("artists", paginated.getContent());
+			model.addAttribute("currentPage", paginated.getCurrentPage());
+			model.addAttribute("totalPages", paginated.getTotalPages());
+			model.addAttribute("totalElements", paginated.getTotalElements());
+			model.addAttribute("size", paginated.getSize());
+			model.addAttribute("hasNext", paginated.isHasNext());
+			model.addAttribute("hasPrevious", paginated.isHasPrevious());
+			model.addAttribute("isFirst", paginated.isFirst());
+			model.addAttribute("isLast", paginated.isLast());
+		}
 		return "layout";
 	}
 
