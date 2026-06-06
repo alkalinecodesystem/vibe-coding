@@ -568,3 +568,7 @@ body {
     background: white;
     z-index: 1;
 }
+
+.text-right {
+    text-align: right;
+}

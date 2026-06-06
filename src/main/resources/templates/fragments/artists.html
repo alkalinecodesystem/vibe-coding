@@ -10,13 +10,14 @@
 
 	<div class="card border-0 shadow-sm mb-4">
 		<div class="card-body">
-			<form class="row g-3" th:action="@{/artists}" method="get" id="searchForm">
-				<div class="col-md-6">
+			<form class="row g-2" th:action="@{/artists}" method="get" id="searchForm">
+				<div class="col">
 					<input type="text" id="search-input" name="q" class="form-control"
-						placeholder="Search artists by name..." th:value="${searchQuery}">
+						placeholder="Search artists by name..." th:value="${searchQuery}" maxlength="100">
 				</div>
-				<div class="col-md-3">
-					<button type="submit" class="btn btn-primary w-100">
+
+				<div class="col-auto">
+					<button type="submit" class="btn btn-primary">
 						<i class="bi bi-search"></i> Search
 					</button>
 				</div>
@@ -32,8 +33,7 @@
 						<tr>
 							<th width="60">#</th>
 							<th>Artist Name</th>
-							<th>Biography</th>
-							<th width="180">Actions</th>
+							<th class="text-end">Actions</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -47,14 +47,18 @@
 									<span th:text="${artist.name}">Artist Name</span>
 								</div>
 							</td>
-							<td>
-								<span th:text="${artist.biography ?: 'No biography available'}" class="text-muted">No biography</span>
-							</td>
-							<td>
-								<button class="btn btn-sm btn-outline-primary view-artist-albums-btn"
-									th:attr="data-artist-id=${artist.id}, data-artist-name=${artist.name}">
-									<i class="bi bi-record-circle"></i> Albums
-								</button>
+							<td class="text-end">
+								<div class="d-inline-flex gap-1">
+									<button class="btn btn-sm btn-outline-primary view-artist-btn"
+										data-bs-toggle="modal" data-bs-target="#artistModal"
+										th:data-artist-id="${artist.id}" th:data-artist-name="${artist.name}">
+										<i class="bi bi-person"></i> Edit
+									</button>
+									<button class="btn btn-sm btn-outline-primary view-artist-albums-btn"
+										th:attr="data-artist-id=${artist.id}, data-artist-name=${artist.name}">
+										<i class="bi bi-record-circle"></i> Albums
+									</button>
+								</div>
 							</td>
 						</tr>
 					</tbody>
@@ -80,8 +84,7 @@
 				<nav aria-label="Artist pagination">
 					<ul class="pagination pagination-sm mb-0">
 						<li class="page-item" th:classappend="${isFirst} ? 'disabled'">
-							<a class="page-link"
-								th:href="@{/artists(page=0, size=${size}, q=${searchQuery ?: ''})}">
+							<a class="page-link" th:href="@{/artists(page=0, size=${size}, q=${searchQuery ?: ''})}">
 								<span aria-hidden="true">&laquo;&laquo;</span>
 							</a>
 						</li>
@@ -91,7 +94,8 @@
 								<span aria-hidden="true">&laquo;</span>
 							</a>
 						</li>
-						<th:block th:with="startPage=${T(java.lang.Math).max(0, currentPage - 2)}, endPage=${T(java.lang.Math).min(totalPages - 1, currentPage + 2)}">
+						<th:block
+							th:with="startPage=${T(java.lang.Math).max(0, currentPage - 2)}, endPage=${T(java.lang.Math).min(totalPages - 1, currentPage + 2)}">
 							<th:block th:each="i : ${#numbers.sequence(startPage, endPage)}">
 								<li class="page-item" th:classappend="${i == currentPage ? 'active' : ''}">
 									<th:block th:if="${i == currentPage}">
@@ -123,7 +127,8 @@
 		</div>
 	</div>
 
-	<div class="modal fade" id="artistAlbumsModal" tabindex="-1" aria-labelledby="artistAlbumsModalLabel" aria-hidden="true">
+	<div class="modal fade" id="artistAlbumsModal" tabindex="-1" aria-labelledby="artistAlbumsModalLabel"
+		aria-hidden="true">
 		<div class="modal-dialog modal-lg">
 			<div class="modal-content">
 				<div class="modal-header">
@@ -141,7 +146,7 @@
 									<th>Songs</th>
 								</tr>
 							</thead>
-							<tbody id="artist-albums-modal-table-body" >
+							<tbody id="artist-albums-modal-table-body">
 							</tbody>
 						</table>
 					</div>
