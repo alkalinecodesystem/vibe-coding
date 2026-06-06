@@ -126,15 +126,6 @@ public class ArtistService {
 		response.setName(artist.getName());
 		response.setBiography(artist.getBiography());
 
-		List<ArtistResponse.AlbumSummary> albumSummaries = artist.getAlbums().stream().map(album -> {
-			ArtistResponse.AlbumSummary summary = new ArtistResponse.AlbumSummary();
-			summary.setId(album.getId());
-			summary.setTitle(album.getTitle());
-			summary.setReleaseYear(album.getReleaseYear());
-			return summary;
-		}).collect(Collectors.toList());
-
-		response.setAlbums(albumSummaries);
 		return response;
 	}
 
