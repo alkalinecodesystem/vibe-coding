@@ -51,17 +51,6 @@ function initArtist() {
                                    <small id="biography-char-count" class="text-muted">${biographyText.length}/1000 characters</small>
                                </div>
                            </div>
-                           <div class="mb-3">
-                               <h5>Albums</h5>
-                               <ul class="list-group">
-                               ${artist.albums && artist.albums.length > 0 ? (() => {
-					const randomAlbums = artist.albums.sort(() => 0.5 - Math.random()).slice(0, 5);
-					return randomAlbums.map(album => `<li class="list-group-item">
-                                     <strong>${album.title}</strong> ${album.releaseYear ? `(${album.releaseYear})` : ''}
-                                   </li>`).join('');
-				})() : '<li class="list-group-item text-muted">No albums found</li>'}
-                               </ul>
-                           </div>
                            <div class="d-flex justify-content-end">
                                <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Close</button>
                                <button type="button" class="btn btn-primary" id="save-artist-btn" data-artist-id="${artistId}">Save Changes</button>
