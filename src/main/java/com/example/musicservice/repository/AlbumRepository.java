@@ -36,7 +36,7 @@ public interface AlbumRepository extends JpaRepository<Album, Long> {
 
 	Page<Album> findByCoverImageIsNotNull(Pageable pageable);
 
-	@Query("SELECT DISTINCT a FROM Album a LEFT JOIN a.songs s WHERE (a.artist.id = :artistId) OR (LOWER(s.originalArtist) = LOWER(:artistName))")
+	@Query("SELECT DISTINCT a FROM Album a LEFT JOIN a.songs s WHERE (a.artist.id = :artistId) OR (LOWER(s.originalArtist) = LOWER(:artistName)) ORDER BY a.releaseYear DESC")
 	Page<Album> findByArtistIdOrSongOriginalArtist(@Param("artistId") Long artistId, @Param("artistName") String artistName, Pageable pageable);
 
 	@Query("SELECT a FROM Album a ORDER BY FUNCTION('RANDOM')")
